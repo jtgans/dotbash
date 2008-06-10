@@ -16,26 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-dotbash-project-pre-hook()
+project-pre-hook()
 {
-    pushd ~/.bash.d >/dev/null
+    : do nothing
 }
 
-dotbash-project-post-hook()
+project-editor-hook()
 {
-    while expr $(dirs -v |wc -l) - 1 > /dev/null; do
-        popd >/dev/null
-    done
+    : do nothing
 }
 
-dotbash-project-init-hook()
+project-post-hook()
 {
-    export EDITOR="vim"
-    export LESS="-MR"
+    local project_name=$1
 
-    project-set-prompt 'dotbash'
+    mkdir -p $HOME/Projects/$project_name
 }
-
-add-hook _PROJECT_PRE_HOOKS dotbash-project-pre-hook
-add-hook _PROJECT_POST_HOOKS dotbash-project-post-hook
-add-hook _INIT_POST_HOOKS dotbash-project-init-hook

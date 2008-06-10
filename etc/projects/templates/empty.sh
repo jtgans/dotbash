@@ -16,24 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-@PROJECT@-project-pre-hook()
+new-project-pre-hook()
 {
-    project-set-dir ~/Projects/@PROJECT@
+    : do nothing
 }
 
-@PROJECT@-project-post-hook()
+new-project-editor-hook()
 {
-    # Do something useful here -- if you use this, change the
-    # _PROJECT_POST_HOOKS add-hook call below to point to
-    # @PROJECT@-project-post-hook instead of project-reset-dir.
-
-    project-reset-dir
+    : do nothing
 }
 
-@PROJECT@-project-init-hook()
+new-project-post-hook()
 {
-    export EDITOR="vim"
-    export LESS="-MR"
-
-    project-set-prompt '@PROJECT@'
+    : do nothing
 }

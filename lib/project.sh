@@ -27,6 +27,20 @@ project-set-prompt()
     export PS1="[${reset}${color}${project_name}${reset}] ${PS1}"
 }
 
+project-set-dir()
+{
+    local project_dir=$1
+
+    pushd $project_dir >/dev/null
+}
+
+project-reset-dir()
+{
+    while expr $(dirs -v |wc -l) - 1 > /dev/null; do
+        popd >/dev/null
+    done
+}
+
 project()
 {
     local project_name=$1
@@ -39,10 +53,14 @@ project()
     if [ -f $_BASH_ETC/projects/$project_name ]; then
         export _PROJECT=$project_name
         source $_BASH_ETC/projects/$project_name
+        add-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
 
-        run-hooks _PROJECT_PRE_HOOKS
+        ${_PROJECT}-project-pre-hook
         $SHELL
-        run-hooks _PROJECT_POST_HOOKS
+        ${_PROJECT}-project-post-hook
+        
+        remove-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
+        unset _PROJECT
     else
         echo "No such project $project_name."
         return 1
@@ -52,25 +70,71 @@ project()
 new-project()
 {
     local project_name=$1
-    local template_script=$2
+    local template=$2
 
     if [ -z "$project_name" ]; then
-        echo "Usage: new-project <project_name> [--template=<template_script>] [--from=<scm_url>|--in=<scm>]"
+        echo "Usage: new-project <project_name> [--template=<template>] [--from=<scm_url>|--in=<scm>]"
         return 1
     fi
 
-    if [ ! -z "$template_script" ]; then
-        template_script=base
+    if [ -z "$template_script" ]; then
+        template=base
     fi
 
-    source $_BASH_ETC/projects/templates/$template_script.sh
-    run-hooks _NEW_PROJECT_PRE_HOOKS
+    if [ -f $_BASH_ETC/projects/templates/$template.sh ]; then
+        source $_BASH_ETC/projects/templates/$template.sh
+    else
+        project-reset-hooks
+    fi
 
-    cp $_BASH_ETC/projects/templates/$template_script.template \
-        $_BASH_ETC/projects/$_PROJECT
-    $EDITOR $_BASH_ETC/projects/$_PROJECT
+    project-pre-hook $project_name
+    cat $_BASH_ETC/projects/templates/$template.template \
+        | sed s/@PROJECT@/$project_name/g                       \
+        > $_BASH_ETC/projects/$project_name
+    project-editor-hook $project_name
+    $EDITOR $_BASH_ETC/projects/$project_name
+    project-post-hook $project_name
 
-    run-hooks _NEW_PROJECT_POST_HOOKS
+    project-reset-hooks
+}
+
+new-project-template()
+{
+    local name=$1
+    local base=$2
+
+    if [ -z "$name" ]; then
+        echo "Usage: new-project-template <template_name> [<base_name>]"
+        return 1
+    fi
+
+    if [ -z "$base" ]; then
+        base="base"
+    fi
+
+    if [ ! -f $_BASH_ETC/projects/templates/$base.template ]; then
+        echo "No template by the name $base was found."
+        return 1
+    fi
+
+    if [ -f $_BASH_ETC/projects/templates/$name.template ]; then
+        echo "Template $name already exists."
+        return 1
+    fi
+
+    cp $_BASH_ETC/projects/templates/$base.template $_BASH_ETC/projects/templates/$name.template
+    cp $_BASH_ETC/projects/templates/$base.sh $_BASH_ETC/projects/templates/$name.sh
+
+    $EDITOR \
+        $_BASH_ETC/projects/templates/$name.template \
+        $_BASH_ETC/projects/templates/$name.sh
+}
+
+project-reset-hooks()
+{
+    eval 'project-pre-hook() { :; }'
+    eval 'project-editor-hook() { :; }'
+    eval 'project-post-hook() { :; }'
 }
 
 project-init-hook()
