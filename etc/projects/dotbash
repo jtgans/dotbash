@@ -16,43 +16,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-project-pre-hook()
-{
-    local project_name=$1
+_PROJECT_DIR=~/.bash.d
 
-    : do nothing
+dotbash-project-pre-hook()
+{
+    : do something useful here.
 }
 
-project-editor-hook()
+dotbash-project-post-hook()
 {
-    local project_name=$1
-
-    : do nothing
+    : do something useful here, too.
 }
 
-project-pre-scm-hook()
+dotbash-project-init-hook()
 {
-    local project_name=$1
-    local project_dir=$2
-    local scm_type=$3
-    local scm_url=$4
-
-    mkdir -p $project_dir
-}
-
-project-post-scm-hook()
-{
-    local project_name=$1
-    local project_dir=$2
-    local scm_type=$3
-    local scm_url=$4
-
-    : do nothing
-}
-
-project-post-hook()
-{
-    local project_name=$1
-
-    : do nothing
+    project-set-prompt 'dotbash'
 }

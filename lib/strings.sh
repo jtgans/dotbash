@@ -21,11 +21,8 @@ in-string()
 	local string=$(get-by-varname $1)
 	local substring=$2
 
-	if [ ! -z "$(echo $string |grep $substring)" ]; then
-		return 0
-	else
-		return 1
-	fi
+	echo $string |grep -q "$substring"
+    return $?
 }
 
 push-word()

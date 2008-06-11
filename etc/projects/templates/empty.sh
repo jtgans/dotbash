@@ -26,6 +26,16 @@ new-project-editor-hook()
     : do nothing
 }
 
+new-project-pre-scm-hook()
+{
+    : do nothing
+}
+
+new-project-post-scm-hook()
+{
+    : do nothing
+}
+
 new-project-post-hook()
 {
     : do nothing

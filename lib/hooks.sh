@@ -19,7 +19,7 @@
 run-hooks()
 {
     local hooks=$(get-by-varname $1)
-    local hook=""
+    local hook
 
     if [ ! -z "$hooks" ]; then
         for hook in $hooks; do
@@ -42,9 +42,9 @@ remove-hook()
 {
     local hooks_varname=$1
     local hooks=$(get-by-varname $1)
-    local hook=""
     local hook_to_remove=$2
-    local new_hooks=""
+    local hook
+    local new_hooks
 
     for hook in $hooks; do
         if [ "$hook" != "$hook_to_remove" ]; then

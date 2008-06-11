@@ -28,17 +28,21 @@ function init-msg()
 
 function get-by-varname()
 {
-        local var_name=$1
-        eval "echo \${$var_name}"
+    local var_name=$1
+    echo ${!var_name}
 }
 
 function set-by-varname()
 {
-        local var_name=$1
-        shift
-        local var_value="$*"
+    local var_name=$1
+    shift
+    local var_value="$*"
 
-        eval "export $var_name=\"$var_value\""
+    if [ -z "$var_value" ]; then
+        unset $var_name
+    else
+        export $var_name="$var_value"
+    fi
 }
 
 function source-dir()
@@ -60,6 +64,27 @@ function source-dir()
 			is-interactive && echo -e " ... failed"
 		fi
 	done
+}
+
+function is-defined()
+{
+    if declare \
+        |grep -ve "^[{} ]"                         \
+        |sed -e 's/=.*//' -e 's/()//' -e 's/ *$//' \
+        |grep -qe "^$1$"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function function-p()
+{
+    if declare -f |grep -e '^.* ()' |grep -qe "^$1 ()"; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 function is-interactive()

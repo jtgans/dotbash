@@ -53,14 +53,19 @@ project()
     if [ -f $_BASH_ETC/projects/$project_name ]; then
         export _PROJECT=$project_name
         source $_BASH_ETC/projects/$project_name
+        add-hook _INIT_POST_HOOKS project-init-hook
         add-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
 
         ${_PROJECT}-project-pre-hook
+        project-set-dir $_PROJECT_DIR
         $SHELL
+        project-reset-dir
         ${_PROJECT}-project-post-hook
         
         remove-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
+        remove-hook _INIT_POST_HOOKS project-init-hook
         unset _PROJECT
+        unset _PROJECT_DIR
     else
         echo "No such project $project_name."
         return 1
@@ -69,32 +74,103 @@ project()
 
 new-project()
 {
-    local project_name=$1
-    local template=$2
+    local project_name
+    local template
+    local scm_type
+    local scm_url
+    local args=$(getopt \
+        -o ht:s:u:                      \
+        --long help,template:,scm:,url: \
+        -n new-project -- "$@")
+
+    eval set -- "$args"
+
+    while true; do
+        case "$1" in
+            -h|--help)
+                echo "Usage: new-project <project_name> [-t <template>] [[-s <scm>] [-u <url>]]"
+                return 1
+                ;;
+
+            -t|--template)
+                template="$2"
+                shift 2
+                ;;
+
+            -s|--scm)
+                scm_type="$2"
+                shift 2
+                ;;
+
+            -u|--url)
+                if [ -z "$scm_type" ]; then
+                    echo "new-project: SCM URL requires an SCM type."
+                    return 1
+                else
+                    scm_url="$2"
+                    shift 2
+                fi
+                ;;
+
+            --)
+                shift
+                break
+                ;;
+        esac
+    done
+
+    project_name=$1
 
     if [ -z "$project_name" ]; then
-        echo "Usage: new-project <project_name> [--template=<template>] [--from=<scm_url>|--in=<scm>]"
+        echo "Usage: new-project <project_name> [-t <template>] [[-s <scm>] [-u <url>]]"
         return 1
     fi
 
-    if [ -z "$template_script" ]; then
+    if [ -z "$template" ]; then
         template=base
     fi
 
+    if [ ! -f $_BASH_ETC/projects/templates/$template.template ]; then
+        echo "new-project: template $template not found."
+        return 1
+    fi
+
+    if [ ! -z "$scm_type" ]; then
+        if ! function-p project-init-scm-${scm_type}; then
+            echo "SCM not supported."
+            return 1
+        fi
+    fi
+
+    project-reset-hooks
     if [ -f $_BASH_ETC/projects/templates/$template.sh ]; then
         source $_BASH_ETC/projects/templates/$template.sh
-    else
-        project-reset-hooks
     fi
 
     project-pre-hook $project_name
     cat $_BASH_ETC/projects/templates/$template.template \
         | sed s/@PROJECT@/$project_name/g                       \
         > $_BASH_ETC/projects/$project_name
+
     project-editor-hook $project_name
     $EDITOR $_BASH_ETC/projects/$project_name
-    project-post-hook $project_name
 
+    if [ "$?" != "0" ]; then
+        echo "new-project: editor returned nonzero -- aborting build."
+        rm $_BASH_ETC/projects/$project_name
+        echo "new-project: some lingering files may have been left behind."
+        return 1
+    fi
+
+    source $_BASH_ETC/projects/$project_name
+
+    project-pre-scm-hook $project_name $_PROJECT_DIR $scm_type $scm_url
+    if [ ! -z "$scm_type" ]; then
+        project-init-scm-${scm_type} $_PROJECT_DIR $scm_url
+    fi
+    project-post-scm-hook $project_name $_PROJECT_DIR $scm_type $scm_url
+
+    project-post-hook $project_name
     project-reset-hooks
 }
 
@@ -134,6 +210,8 @@ project-reset-hooks()
 {
     eval 'project-pre-hook() { :; }'
     eval 'project-editor-hook() { :; }'
+    eval 'project-pre-scm-hook() { :; }'
+    eval 'project-post-scm-hook() { :; }'
     eval 'project-post-hook() { :; }'
 }
 
@@ -144,4 +222,18 @@ project-init-hook()
     fi
 }
 
-add-hook _INIT_POST_HOOKS project-init-hook
+project-init-scm-git()
+{
+    local project_dir=$1
+    local scm_url=$2
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        git init
+    else
+        git clone $scm_url /tmp/new-project.$project_name.$$
+        find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        rmdir /tmp/new-project.$project_name.$$
+    fi
+    project-reset-dir
+}
