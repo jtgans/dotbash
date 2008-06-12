@@ -237,3 +237,18 @@ project-init-scm-git()
     fi
     project-reset-dir
 }
+
+project-init-scm-svn()
+{
+    local project_dir=$1
+    local scm_url=$2
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        echo "new-project: initting from SVN requires an scm_url."
+        return 1
+    else
+        svn co $scm_url .
+    fi
+    project-reset-dir
+}
