@@ -72,6 +72,30 @@ project()
     fi
 }
 
+edit-project()
+{
+    local project_name=$1
+
+    if [ -z "$project_name" ]; then
+        echo "Usage: edit-project <project_name>"
+    else
+        if [ -f $_BASH_ETC/projects/$project_name ]; then
+            $EDITOR $_BASH_ETC/projects/$project_name
+        else
+            echo "No such project $project_name."
+        fi
+    fi
+}
+
+list-projects()
+{
+    for i in $_BASH_ETC/projects/*; do
+        if [ -f $i ]; then
+            echo $(basename $i)
+        fi
+    done
+}
+
 new-project()
 {
     local project_name
