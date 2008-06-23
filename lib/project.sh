@@ -72,6 +72,30 @@ project()
     fi
 }
 
+edit-project()
+{
+    local project_name=$1
+
+    if [ -z "$project_name" ]; then
+        echo "Usage: edit-project <project_name>"
+    else
+        if [ -f $_BASH_ETC/projects/$project_name ]; then
+            $EDITOR $_BASH_ETC/projects/$project_name
+        else
+            echo "No such project $project_name."
+        fi
+    fi
+}
+
+list-projects()
+{
+    for i in $_BASH_ETC/projects/*; do
+        if [ -f $i ]; then
+            echo $(basename $i)
+        fi
+    done
+}
+
 new-project()
 {
     local project_name
@@ -234,6 +258,21 @@ project-init-scm-git()
         git clone $scm_url /tmp/new-project.$project_name.$$
         find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
         rmdir /tmp/new-project.$project_name.$$
+    fi
+    project-reset-dir
+}
+
+project-init-scm-svn()
+{
+    local project_dir=$1
+    local scm_url=$2
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        echo "new-project: initting from SVN requires an scm_url."
+        return 1
+    else
+        svn co $scm_url .
     fi
     project-reset-dir
 }
