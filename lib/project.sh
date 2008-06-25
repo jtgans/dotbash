@@ -22,9 +22,9 @@ project-set-prompt()
 {
     local project_name=$1
     local reset=$(term-reset-color)
-    local color=$(term-set-color 3 6)
+    local color=$(term-set-attrib bright; term-set-fg 6)
 
-    export PS1="[${reset}${color}${project_name}${reset}] ${PS1}"
+    export PS1="[\\[${reset}${color}\\]${project_name}\\[${reset}\\]] ${PS1}"
 }
 
 project-set-dir()

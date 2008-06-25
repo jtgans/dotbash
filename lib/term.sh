@@ -61,15 +61,57 @@ term-restore-state()
 
 term-reset-color()
 {
-    echo -ne '\e[m'
+    echo -ne '\e[0m'
 }
 
-term-set-color()
+term-set-fg()
 {
     local fg=$1
-    local bg=$2
 
-    echo -ne "\\e[${fg}${bg}m"
+    term-set-attribs "3${1}"
+}
+
+term-set-bg()
+{
+    local bg=$1
+
+    term-set-attribs "4${1}"
+}
+
+term-set-attrib()
+{
+    local attrib=$1
+
+    case "$attrib" in
+        reset)      attrib=0 ;;
+        bright)     attrib=1 ;;
+        dim)        attrib=2 ;;
+        underscore) attrib=4 ;;
+        blink)      attrib=5 ;;
+        reverse)    attrib=6 ;;
+        hidden)     attrib=8 ;;
+        *)          return 0 ;;
+    esac
+
+    term-set-attribs $attrib
+}
+
+term-set-attribs()
+{
+    local attrib
+
+    if [ "$#" == "0" ]; then
+        return 0
+    fi
+
+    echo -ne "\\e["
+    while [ "$#" != "0" ]; do
+        attrib=$1; shift
+
+        echo -ne $attrib
+        [ "$#" != "0" ] && echo -ne ";"
+    done
+    echo -ne "m"
 }
 
 term-show-colors()
