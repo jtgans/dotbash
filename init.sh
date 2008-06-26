@@ -96,7 +96,7 @@ function is-interactive()
 	fi
 }
 
-export _SYSTEM=$(uname -s |tr [A-Z] [a-z])
+export _SYSTEM=$(uname -s |tr '[A-Z]' '[a-z]')
 export _HOSTNAME=$(hostname |sed 's/\..*//')
 export _BASH_LIB=${HOME}/.bash.d/lib
 export _BASH_SYS=${HOME}/.bash.d/sys
