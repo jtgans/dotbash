@@ -18,12 +18,12 @@
 
 function init-msg()
 {
-	local error_msg=$1; shift
+    local error_msg=$1; shift
 
-	if is-interactive; then
-		echo -e '\007'
-		echo "bash-init: $error_msg"
-	fi
+    if is-interactive; then
+        echo -e '\007'
+        echo "bash-init: $error_msg"
+    fi
 }
 
 function get-by-varname()
@@ -47,23 +47,23 @@ function set-by-varname()
 
 function source-dir()
 {
-	local dir=$1; shift
+    local dir=$1; shift
 
 
-	for i in $(find $dir -name \*.sh); do
-		local libname=$(basename $i |sed 's/\.sh$//')
+    for i in $(find $dir -name \*.sh); do
+        local libname=$(basename $i |sed 's/\.sh$//')
 
-		is-interactive && echo -n "Loading library: "
-		is-interactive && term-save-state
-		is-interactive && echo -n $libname
+        is-interactive && echo -n "Loading library: "
+        is-interactive && term-save-state
+        is-interactive && echo -n $libname
 
-		if require $libname; then
-			is-interactive && term-restore-state
-			is-interactive && term-clear-line
-		else
-			is-interactive && echo -e " ... failed"
-		fi
-	done
+        if require $libname; then
+            is-interactive && term-restore-state
+            is-interactive && term-clear-line
+        else
+            is-interactive && echo -e " ... failed"
+        fi
+    done
 }
 
 function is-defined()
@@ -89,11 +89,11 @@ function function-p()
 
 function is-interactive()
 {
-	if [ ! -z "${_INTERACTIVE}" ]; then
-		return 0
-	else
-		return 1
-	fi
+    if [ ! -z "${_INTERACTIVE}" ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 export _SYSTEM=$(uname -s |tr '[A-Z]' '[a-z]')
@@ -114,9 +114,9 @@ source ${_BASH_SYS}/common.sh
 
 # Load the specific system config
 if [ -f ${_BASH_SYS}/${_SYSTEM}.sh ]; then
-	source ${_BASH_SYS}/${_SYSTEM}.sh
+    source ${_BASH_SYS}/${_SYSTEM}.sh
 else
-	init-msg "warning: No system-specific configuration detected."
+    init-msg "warning: No system-specific configuration detected."
 fi
 
 require hooks
