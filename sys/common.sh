@@ -24,16 +24,3 @@ shopt -s cmdhist
 shopt -s extglob
 shopt -s hostcomplete
 shopt -s histappend
-
-if [ "$TERM" == "dtterm" ]; then
-  export TERM="xterm"       # Makes terminfo happy
-
-  alias dock='echo -ne "\E[2t"'
-  alias raise='echo -ne "\E[5t"'
-  alias 132x30='echo -ne "\E[8;132;30t"'
-  alias 80x30='echo -ne "\E[8;80;30t"'
-  alias maxh='echo -ne "\E[8;0;80t"'
-  alias maxw='echo -ne "\E[8;24;0t"'
-  alias bgmake='dock; make \~*; raise'
-fi
-

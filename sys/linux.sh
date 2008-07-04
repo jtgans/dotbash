@@ -16,23 +16,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+require screen
+require string
+
 eval $(dircolors -b)
 alias ls='ls --color=auto -hsF'
 alias ll='ls -l'
 alias la='ls -A'
-alias dhelp='BROWSER=/usr/bin/w3m dhelp -f'
+alias dhelp='dhelp -f'
 
 # Setup an appropriate locale
 LANG=$(locale -a |grep en_US.utf8 |head -n 1)
-if [ "$LANG" == "" ]; then
+if [ -z "$LANG" ]; then
     LANG=$(locale -a |grep en_US |head -n 1)
-    if [ "$LANG" == "" ]; then
+    if [ -z "$LANG" ]; then
         LANG=C
     fi
 fi
 export LANG
+export LC_COLLATE=C
 
-if echo $TERM |grep -q xterm; then
+if in-string TERM xterm; then
     export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"; history -a'
 else
     export PROMPT_COMMAND='history -a'
@@ -41,10 +45,10 @@ fi
 export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
-export EDITOR="/usr/bin/emacs"
+export EDITOR="${HOME}/.bin/emacs.sh"
 export BROWSER="/usr/bin/elinks -remote %s"
 export LESS="-MR"
-export HISTTIMEFORMAT="%m/%d/%Y %H:%i:%s"
+export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
 
 export PS1='\h:\w\$ '
 
@@ -52,24 +56,14 @@ export PS1='\h:\w\$ '
 export DEBEMAIL="june@theonelab.com"
 export DEBFULLNAME="June Tate-Gans"
 
-# Screen related stuff
-if [ "$INTERACTIVE" != "" ]; then
-    if [ "$WINDOW" = "" ]; then
-        if [ -x /usr/bin/screen ]; then
-            echo
-            # screen -a -A -d -RR
-        else
-            echo "Screen not available in /usr/bin/screen -- cannot start screen."
-        fi
-    else
-        alias  emacs="${HOME}/.bin/emacs.sh"
-        export EDITOR="${HOME}/.bin/emacs.sh"
-        export TERM="screen"
-        unset TERMCAP  # Fix broken ncurses behavior
-    fi
+alias  emacs="${HOME}/.bin/emacs.sh"
+
+if in-screen; then
+    export TERM="screen"
+    unset TERMCAP  # Fix broken ncurses behavior
 fi
 
 # RubyGems related stuff
-if [ "$GEM_HOME" != "" ]; then
+if [ ! -z "$GEM_HOME" ]; then
     export PATH="${PATH}:$GEM_HOME/bin"
 fi
