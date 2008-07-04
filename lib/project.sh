@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 require term
+require url
 
 project-set-prompt()
 {
@@ -341,4 +342,40 @@ project-init-scm-svn()
         svn co $scm_url .
     fi
     project-reset-dir
+}
+
+project-init-scm-cvs()
+{
+    local project_dir=$1
+    local scm_url=$2
+    local method=$(url-protocol $scm_url)
+    local host=$(url-host $scm_url)
+    local path=$(url-path $scm_url)
+    local user=$(url-user $scm_url)
+    local module=$(url-anchor $scm_url)
+    local hostpart
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        echo "new-project: initting from CVS requires an scm_url."
+        return 1
+    else
+        if [ ! -z $user ]; then
+            hostpart="$user@$host"
+        else
+            hostpart=$host
+        fi
+
+        pushd /tmp >/dev/null
+        cvs -z3 -d:$method:$hostpart:$path co -d new-project.$project_name.$$ $module
+        
+        if [ "$?" != "0" ]; then
+            echo "Unable to get $module from $scm_url. Aborting."
+            return 1
+        fi
+
+        find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        rmdir /tmp/new-project.$project_name.$$
+        popd >/dev/null
+    fi
 }
