@@ -18,6 +18,8 @@
 
 _PROJECT_DIR=~/Projects/@PROJECT@
 
+alias cd='project-cd'
+
 @PROJECT@-project-pre-hook()
 {
     : do something useful here.

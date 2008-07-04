@@ -18,6 +18,8 @@
 
 _PROJECT_DIR=~/.bash.d
 
+alias cd='project-cd'
+
 dotbash-project-pre-hook()
 {
     : do something useful here.

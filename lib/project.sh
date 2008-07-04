@@ -42,6 +42,21 @@ project-reset-dir()
     done
 }
 
+project-cd()
+{
+    local dir=$1
+
+    if [ "$dir" == "~~" ]; then
+        if [ ! -z $_PROJECT_DIR ]; then
+            builtin cd $_PROJECT_DIR
+        else
+            echo "$0: no project set."
+        fi
+    else
+        builtin cd $@
+    fi
+}
+
 project()
 {
     local project_name=$1
@@ -366,17 +381,20 @@ project-init-scm-cvs()
             hostpart=$host
         fi
 
-        pushd /tmp >/dev/null
-        cvs -z3 -d:$method:$hostpart:$path co -d new-project.$project_name.$$ $module
+        mkdir -p /tmp/new-project.$project_name.$$
+        pushd /tmp/new-project.$project_name.$$ >/dev/null
+        cvs -z3 -d:$method:$hostpart:$path co $module
         
         if [ "$?" != "0" ]; then
             echo "Unable to get $module from $scm_url. Aborting."
             return 1
         fi
 
-        find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
-        rmdir /tmp/new-project.$project_name.$$
         popd >/dev/null
+
+        find /tmp/new-project.$project_name.$$/$module \
+            -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        rm -rf /tmp/new-project.$project_name.$$
     fi
     project-reset-dir
 }
