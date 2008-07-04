@@ -1,4 +1,4 @@
-# -*- sh -*-
+#!/bin/bash
 #
 # Copyright (C) 2008  June Tate-Gans, All Rights Reserved.
 #
@@ -20,17 +20,59 @@ require "screen"
 
 ssh()
 {
-	local remotehost="unknown"
+    local ssh_args
+    local remotehost
+    local emacs_remote_port
 
-	for i in $@; do
-		if [ "${i:0:1}" != "-" ]; then
-			remotehost=$i
-			break
-		fi
-	done
+    local emacs_server_file=$HOME/.emacs.d/server/server
+    local args=$(getopt \
+        -o 1246AaCfgKkMNnqsTtVvXxYb:c:D:e:F:i:L:l:m:O:o:p:R:S:w: \
+        -n ssh -- "$@")
+
+    eval set -- "$args"
+
+    while true; do
+        case "$1" in
+            -[bcDeFiLlmOopRSw])
+                ssh_args="$ssh_args $1 $2"
+                shift 2
+                ;;
+
+            --)
+                shift
+                break
+                ;;
+
+            *)
+                ssh_args="$ssh_args $1"
+                shift
+                ;;
+        esac
+    done
+
+    remotehost=$1
+
+    if in-string remotehost '@'; then
+        remotehost=$(echo $remotehost |sed 's/.*@//')
+    fi
+
+    if [ -f $emacs_server_file ]; then
+        emacs_remote_pid=$(cat $emacs_server_file \
+            |head -1 |awk '{ print $2; }')
+        emacs_remote_port=$(cat $emacs_server_file \
+            |head -1 |sed 's/:/ /' |awk '{ print $2; }')
+        emacs_remote_pw=$(cat $emacs_server_file \
+            |tail -1)
+
+        if kill -n 0 $emacs_remote_pid 2>/dev/null; then
+            export EMACS_PASS=$emacs_remote_pw
+            export EMACS_PORT=$emacs_remote_port
+
+            ssh_args="$ssh_args -L${emacs_remote_port}:localhost:${emacs_remote_port}"
+        fi
+    fi
 
 	screen-set-window-title ${remotehost}
-	/usr/bin/ssh $@
+	/usr/bin/ssh $ssh_args $@
 	screen-set-window-title ${HOSTNAME}
 }
-
