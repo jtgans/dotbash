@@ -96,6 +96,30 @@ list-projects()
     done
 }
 
+rm-project()
+{
+    local project_name=$1
+
+    if [ -z "$project_name" ]; then
+        echo "Usage: rm-project <project_name>"
+    else
+        if [ ! -f $_BASH_ETC/projects/$project_name ]; then
+            echo "No such project $project_name."
+            return 1
+        fi
+
+        source $_BASH_ETC/projects/$project_name
+        
+        if [ -d $_PROJECT_DIR ]; then
+            rm -rf $_PROJECT_DIR
+        fi
+
+        rm $_BASH_ETC/projects/$project_name
+
+        unset _PROJECT_DIR
+    fi
+}
+
 new-project()
 {
     local project_name
@@ -258,6 +282,48 @@ project-init-scm-git()
         git clone $scm_url /tmp/new-project.$project_name.$$
         find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
         rmdir /tmp/new-project.$project_name.$$
+    fi
+    project-reset-dir
+}
+
+project-init-scm-tla()
+{
+    local project_dir=$1
+    local scm_url=$(echo $2 |sed 's/#/ /' |awk '{ print $1; }')
+    local tla_branch=$(echo $2 |sed 's/#/ /' |awk '{ print $2; }')
+    local archive_name=$(tla archives |grep -B1 $scm_url |head -1)
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        tla init-tree $project_name--main--0
+    else
+        if [ ! -z "$archive_name" ]; then
+            echo "$scm_url already registered as $archive_name"
+        else
+            result=$(tla register-archive $scm_url)
+
+            if [ "$?" != "0" ]; then
+                echo "Unable to register $scm_url. Aborting."
+                return 1
+            fi
+
+            archive_name=$(tla archives |grep -B1 $scm_url |head -1)
+            echo "$scm_url registered as $archive_name"
+        fi
+
+        if [ ! -z "$tla_branch" ]; then
+            tla get -A $archive_name $tla_branch /tmp/new-project.$project_name.$$
+
+            if [ "$?" != "0" ]; then
+                echo "Unable to get $tla_branch from $archive_name. Aborting."
+                return 1
+            fi
+
+            find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+            rmdir /tmp/new-project.$project_name.$$
+        else
+            echo "No branch specified to 'get', so not getting."
+        fi
     fi
     project-reset-dir
 }
