@@ -378,4 +378,5 @@ project-init-scm-cvs()
         rmdir /tmp/new-project.$project_name.$$
         popd >/dev/null
     fi
+    project-reset-dir
 }
