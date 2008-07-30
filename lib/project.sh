@@ -302,6 +302,22 @@ project-init-scm-git()
     project-reset-dir
 }
 
+project-init-scm-hg()
+{
+    local project_dir=$1
+    local scm_url=$2
+
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        hg init
+    else
+        hg clone $scm_url /tmp/new-project.$project_name.$$
+        find /tmp/new-project.$project_Name$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        rmdir /tmp/new-project.$project_name.$$
+    fi
+    project-reset-dir
+}
+
 project-init-scm-tla()
 {
     local project_dir=$1

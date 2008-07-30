@@ -45,7 +45,7 @@ fi
 export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
-export EDITOR="${HOME}/.bin/emacs.sh"
+export EDITOR="$(which emacsclient) -c"
 export BROWSER="/usr/bin/elinks -remote %s"
 export LESS="-MR"
 export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
