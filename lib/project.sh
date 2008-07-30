@@ -286,7 +286,7 @@ project-init-hook()
     fi
 }
 
-if builtin complete; then
+if builtin complete >/dev/null 2>/dev/null; then
     _project()
     {
         local cur=${COMP_WORDS[COMP_CWORD]}
