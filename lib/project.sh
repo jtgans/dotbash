@@ -286,6 +286,21 @@ project-init-hook()
     fi
 }
 
+if builtin complete; then
+    _project()
+    {
+        local cur=${COMP_WORDS[COMP_CWORD]}
+        COMPREPLY=()
+        if [ $COMP_CWORD -eq 1 ]; then
+            COMPREPLY=( $(compgen -W "$(list-projects)" $cur) )
+        fi
+    }
+
+    complete -F _project project
+    complete -F _project rm-project
+    complete -F _project edit-project
+fi
+
 project-init-scm-git()
 {
     local project_dir=$1
@@ -312,7 +327,7 @@ project-init-scm-hg()
         hg init
     else
         hg clone $scm_url /tmp/new-project.$project_name.$$
-        find /tmp/new-project.$project_Name$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
         rmdir /tmp/new-project.$project_name.$$
     fi
     project-reset-dir
