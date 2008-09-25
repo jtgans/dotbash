@@ -101,6 +101,7 @@ export _HOSTNAME=$(hostname |sed 's/\..*//')
 export _BASH_LIB=${HOME}/.bash.d/lib
 export _BASH_SYS=${HOME}/.bash.d/sys
 export _BASH_ETC=${HOME}/.bash.d/etc
+export _SDKS_DIR=${HOME}/SDKs
 export _INTERACTIVE=$([ "$PS1" != "" ] && echo true)
 set +u
 
