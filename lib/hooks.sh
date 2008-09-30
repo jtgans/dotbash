@@ -20,10 +20,15 @@ run-hooks()
 {
     local hooks=$(get-by-varname $1)
     local hook
+    shift
 
     if [ ! -z "$hooks" ]; then
         for hook in $hooks; do
-            $hook
+            if debug-p; then
+                echo "Running $hook"
+            fi
+
+            $hook "$@"
         done
     fi
 }
