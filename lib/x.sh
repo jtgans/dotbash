@@ -16,31 +16,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-export _IN_SCREEN=$([ ! -z "${WINDOW}" ] && echo true)
-
-in-screen()
+function x-display-live()
 {
-	if [ ! -z "${_IN_SCREEN}" ]; then
-		return 0
-	else
-		return 1
-	fi
+    if [ ! -z "$DISPLAY" ]; then
+        xdpyinfo >/dev/null 2>/dev/null
+
+        if [ "$?" != "0" ]; then
+            return 1
+        else
+            return 0
+        fi
+    fi
 }
 
-screen-set-window-title()
+function verify-x-display-live()
 {
-	if in-screen; then
-		echo -ne "\\ek$@\\e\\\\"
-	fi
-}
-
-screen-ssh-pre-hook()
-{
-    local remotehost=$1
-    screen-set-window-title $remotehost
-}
-
-screen-ssh-post-hook()
-{
-    screen-set-window-title $HOSTNAME
+    if ! x-display-live; then
+        unset DISPLAY
+    fi
 }

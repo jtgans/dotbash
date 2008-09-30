@@ -16,31 +16,34 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-export _IN_SCREEN=$([ ! -z "${WINDOW}" ] && echo true)
-
-in-screen()
+function pidofuser()
 {
-	if [ ! -z "${_IN_SCREEN}" ]; then
-		return 0
-	else
-		return 1
-	fi
-}
+    local process_name=$1
+    local userid=$2
+    local ps_cmd
+    local result
 
-screen-set-window-title()
-{
-	if in-screen; then
-		echo -ne "\\ek$@\\e\\\\"
-	fi
-}
+    if [ -z "$process_name" ]; then
+        echo "Usage: pidofuser <process_name> [<username>]"
+        return 1
+    fi
 
-screen-ssh-pre-hook()
-{
-    local remotehost=$1
-    screen-set-window-title $remotehost
-}
+    if [ ! -z "$userid" ]; then
+        ps_cmd="ps -U $userid -u $userid u"
+    else
+        ps_cmd="ps -U $USER -u $USER u"
+    fi
 
-screen-ssh-post-hook()
-{
-    screen-set-window-title $HOSTNAME
+    result=$($ps_cmd \
+        |grep -v "PID"               \
+        |awk '{ print $2 " " $11; }' \
+        |grep $process_name          \
+        |awk '{ print $1 }')
+    echo $result
+
+    if [ -z "$result" ]; then
+        return 1
+    else
+        return 0
+    fi
 }

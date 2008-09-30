@@ -18,6 +18,8 @@
 
 require screen
 require string
+require emacs
+require ssh
 
 eval $(dircolors -b)
 alias ls='ls --color=auto -hsF'
@@ -34,14 +36,9 @@ if [ -z "$LANG" ]; then
     fi
 fi
 export LANG
+
 export LC_COLLATE=C
-
-if in-string TERM xterm; then
-    export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"; history -a'
-else
-    export PROMPT_COMMAND='history -a'
-fi
-
+export PROMPT_COMMAND='history -a'
 export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
@@ -56,14 +53,19 @@ export PS1='\h:\w\$ '
 export DEBEMAIL="june@theonelab.com"
 export DEBFULLNAME="June Tate-Gans"
 
-alias  emacs="${HOME}/.bin/emacs.sh"
-
 if in-screen; then
     export TERM="screen"
     unset TERMCAP  # Fix broken ncurses behavior
+
+    add-hook ssh_pre_hooks screen-ssh-pre-hook
+    add-hook ssh_post_hooks screen-ssh-post-hook
 fi
+
+add-hook ssh_pre_hooks emacs-server-ssh-pre-hook
 
 # RubyGems related stuff
 if [ ! -z "$GEM_HOME" ]; then
     export PATH="${PATH}:$GEM_HOME/bin"
 fi
+
+daemonize-emacs
