@@ -96,6 +96,21 @@ function is-interactive()
     fi
 }
 
+function debug-p()
+{
+    is-defined _DEBUG_MODE
+}
+
+function set-debug-mode()
+{
+    export _DEBUG_MODE=t
+}
+
+function clear-debug-mode()
+{
+    unset _DEBUG_MODE
+}
+
 export _SYSTEM=$(uname -s |tr '[A-Z]' '[a-z]')
 export _HOSTNAME=$(hostname |sed 's/\..*//')
 export _BASH_LIB=${HOME}/.bash.d/lib
