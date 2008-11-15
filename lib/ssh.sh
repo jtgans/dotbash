@@ -70,6 +70,7 @@ function ssh()
     fi
 
     run-hooks ssh_pre_hooks $remotehost
+    debug-p && echo /usr/bin/ssh $ssh_exec_args $@
 	/usr/bin/ssh $ssh_exec_args $@
     return_code=$?
     run-hooks ssh_post_hooks $remotehost
