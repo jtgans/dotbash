@@ -25,7 +25,14 @@ function daemonize-emacs()
     local pidof_emacs=$(pidofuser emacs)
 
     if [ -z "$pidof_emacs" ]; then
-        $(which emacs) --daemon
+        echo "Daemonizing emacs: "
+        $(which emacs) --daemon >/dev/null
+
+        if [ "$?" == "0" ]; then
+            echo $(which emacs)
+        else
+            echo failed.
+        fi
     fi
 
     return 0
@@ -42,14 +49,18 @@ function emacs()
     fi
 
     if [ ! -z "$EMACS_REMOTE_DATA" ]; then
-        echo -n $EMACS_REMOTE_DATA > $server_file
+        echo $EMACS_REMOTE_DATA \
+            | awk '{ printf("%s %s\n%s", $1, $2, $3); }' \
+            > $server_file
         args="$args -f /tmp/$server_file"
     fi
 
     if verify-x-display-live; then
         emacsclient $args -c "$@"
+        debug-p && echo emacsclient $args -c "$@"
     else
         emacsclient $args -c -t "$@"
+        debug-p && echo emacsclient $args -c -t "$@"
     fi
 
     result=$?
@@ -72,9 +83,13 @@ function emacs-server-ssh-pre-hook()
 
         if kill -n 0 $emacs_remote_pid 2>/dev/null; then
             export EMACS_REMOTE_DATA=$(cat $emacs_server_file)
+
             ssh-hook-alter-ssh-args \
                 "$(ssh-hook-get-args)" \
+                "-oSendEnv=EMACS_REMOTE_DATA" \
                 "-L${emacs_remote_port}:localhost:${emacs_remote_port}"
+
+            unset EMACS_REMOTE_DATA
         fi
     fi
 }
