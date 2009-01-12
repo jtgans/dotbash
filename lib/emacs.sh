@@ -25,8 +25,8 @@ function daemonize-emacs()
     local pidof_emacs=$(pidofuser emacs)
 
     if [ -z "$pidof_emacs" ]; then
-        echo "Daemonizing emacs: "
-        $(which emacs) --daemon >/dev/null
+        echo -n "Daemonizing emacs: "
+        $(which emacs) --daemon 2>&1 2>/dev/null
 
         if [ "$?" == "0" ]; then
             echo $(which emacs)
