@@ -44,7 +44,7 @@ project-reset-dir()
 
 project-cd()
 {
-    local dir=$1
+    local dir="$@"
 
     if [ "$dir" == "~~" ]; then
         if [ ! -z $_PROJECT_DIR ]; then
@@ -53,7 +53,7 @@ project-cd()
             echo "$0: no project set."
         fi
     else
-        builtin cd $@
+        builtin cd "$@"
     fi
 }
 
