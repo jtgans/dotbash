@@ -44,7 +44,7 @@ export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
 export EDITOR="$(which emacsclient) -c"
 export BROWSER="/usr/bin/elinks -remote %s"
-export LESS="-MR"
+export LESS="-MRFX"
 export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
 
 export PS1='\h:\w\$ '
