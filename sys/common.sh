@@ -18,6 +18,8 @@
 
 umask 022
 
+export HISTCONTROL="ignoredups:erasedups"
+
 shopt -s checkhash
 shopt -s checkwinsize
 shopt -s cmdhist
