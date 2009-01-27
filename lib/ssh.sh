@@ -47,7 +47,7 @@ function ssh()
     while true; do
         case "$1" in
             -[bcDeFiLlmOopRSw])
-                ssh_exec_args="$ssh_args $1 $2"
+                ssh_exec_args="$ssh_exec_args $1 $2"
                 shift 2
                 ;;
 
@@ -57,7 +57,7 @@ function ssh()
                 ;;
 
             *)
-                ssh_exec_args="$ssh_args $1"
+                ssh_exec_args="$ssh_exec_args $1"
                 shift
                 ;;
         esac
