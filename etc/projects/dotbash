@@ -18,19 +18,18 @@
 
 _PROJECT_DIR=~/.bash.d
 
-alias cd='project-cd'
-
-dotbash-project-pre-hook()
+function dotbash-project-pre-hook()
 {
     : do something useful here.
 }
 
-dotbash-project-post-hook()
+function dotbash-project-post-hook()
 {
     : do something useful here, too.
 }
 
-dotbash-project-init-hook()
+function dotbash-project-init-hook()
 {
+    alias cd='project-cd'
     project-set-prompt 'dotbash'
 }
