@@ -18,19 +18,18 @@
 
 _PROJECT_DIR=~/Projects/@PROJECT@
 
-alias cd='project-cd'
-
-@PROJECT@-project-pre-hook()
+function @PROJECT@-project-pre-hook()
 {
     : do something useful here.
 }
 
-@PROJECT@-project-post-hook()
+function @PROJECT@-project-post-hook()
 {
     : do something useful here, too.
 }
 
-@PROJECT@-project-init-hook()
+function @PROJECT@-project-init-hook()
 {
+    alias cd='project-cd'
     project-set-prompt '@PROJECT@'
 }

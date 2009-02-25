@@ -18,21 +18,20 @@
 
 _PROJECT_DIR=~/Projects/@PROJECT@
 
-alias cd='project-cd'
-
-@PROJECT@-project-pre-hook()
+function @PROJECT@-project-pre-hook()
 {
     : do something useful here.
 }
 
-@PROJECT@-project-post-hook()
+function @PROJECT@-project-post-hook()
 {
     : do something useful here, too.
 }
 
-@PROJECT@-project-init-hook()
+function @PROJECT@-project-init-hook()
 {
     project-set-prompt '@PROJECT@'
+    alias cd='project-cd'
 
-    export PATH=$PATH:$HOME/android/tools
+    export PATH="$PATH:$HOME/SDKs/android/tools"
 }
