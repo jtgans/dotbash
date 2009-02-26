@@ -19,7 +19,7 @@
 require term
 require url
 
-project-set-prompt()
+function project-set-prompt()
 {
     local project_name=$1
     local reset=$(term-reset-color)
@@ -28,21 +28,21 @@ project-set-prompt()
     export PS1="[\\[${reset}${color}\\]${project_name}\\[${reset}\\]] ${PS1}"
 }
 
-project-set-dir()
+function project-set-dir()
 {
     local project_dir=$1
 
     pushd $project_dir >/dev/null
 }
 
-project-reset-dir()
+function project-reset-dir()
 {
     while expr $(dirs -v |wc -l) - 1 > /dev/null; do
         popd >/dev/null
     done
 }
 
-project-cd()
+function project-cd()
 {
     local dir="$@"
 
@@ -57,7 +57,7 @@ project-cd()
     fi
 }
 
-project()
+function project()
 {
     local project_name=$1
     
@@ -88,7 +88,7 @@ project()
     fi
 }
 
-edit-project()
+function edit-project()
 {
     local project_name=$1
 
@@ -103,7 +103,7 @@ edit-project()
     fi
 }
 
-list-projects()
+function list-projects()
 {
     for i in $_BASH_ETC/projects/*; do
         if [ -f $i ]; then
@@ -112,7 +112,7 @@ list-projects()
     done
 }
 
-rm-project()
+function rm-project()
 {
     local project_name=$1
 
@@ -136,7 +136,7 @@ rm-project()
     fi
 }
 
-new-project()
+function new-project()
 {
     local project_name
     local template
@@ -238,7 +238,7 @@ new-project()
     project-reset-hooks
 }
 
-new-project-template()
+function new-project-template()
 {
     local name=$1
     local base=$2
@@ -270,7 +270,7 @@ new-project-template()
         $_BASH_ETC/projects/templates/$name.sh
 }
 
-project-reset-hooks()
+function project-reset-hooks()
 {
     eval 'project-pre-hook() { :; }'
     eval 'project-editor-hook() { :; }'
@@ -279,7 +279,7 @@ project-reset-hooks()
     eval 'project-post-hook() { :; }'
 }
 
-project-init-hook()
+function project-init-hook()
 {
     if [ ! -z "$_PROJECT" ]; then
         source $_BASH_ETC/projects/$_PROJECT
@@ -287,7 +287,7 @@ project-init-hook()
 }
 
 if builtin complete >/dev/null 2>/dev/null; then
-    _project()
+    function _project()
     {
         local cur=${COMP_WORDS[COMP_CWORD]}
         COMPREPLY=()
@@ -301,7 +301,7 @@ if builtin complete >/dev/null 2>/dev/null; then
     complete -F _project edit-project
 fi
 
-project-init-scm-git()
+function project-init-scm-git()
 {
     local project_dir=$1
     local scm_url=$2
@@ -317,7 +317,7 @@ project-init-scm-git()
     project-reset-dir
 }
 
-project-init-scm-hg()
+function project-init-scm-hg()
 {
     local project_dir=$1
     local scm_url=$2
@@ -333,7 +333,7 @@ project-init-scm-hg()
     project-reset-dir
 }
 
-project-init-scm-tla()
+function project-init-scm-tla()
 {
     local project_dir=$1
     local scm_url=$(echo $2 |sed 's/#/ /' |awk '{ print $1; }')
@@ -375,7 +375,7 @@ project-init-scm-tla()
     project-reset-dir
 }
 
-project-init-scm-svn()
+function project-init-scm-svn()
 {
     local project_dir=$1
     local scm_url=$2
@@ -390,7 +390,7 @@ project-init-scm-svn()
     project-reset-dir
 }
 
-project-init-scm-cvs()
+function project-init-scm-cvs()
 {
     local project_dir=$1
     local scm_url=$2

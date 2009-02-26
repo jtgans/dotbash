@@ -32,7 +32,7 @@
 
 require string
 
-url-split()
+function url-split()
 {
     local url=$1
     local protocol
@@ -69,7 +69,7 @@ url-split()
     echo -e "$protocol\t$user\t$host\t$path\t$anchor"
 }
 
-valid-url()
+function valid-url()
 {
     local url=$1
     local protocol=$(url-protocol $url)
@@ -86,27 +86,27 @@ valid-url()
     return 0
 }
 
-url-protocol()
+function url-protocol()
 {
     url-split $1 |cut -f1
 }
 
-url-user()
+function url-user()
 {
     url-split $1 |cut -f2
 }
 
-url-host()
+function url-host()
 {
     url-split $1 |cut -f3
 }
 
-url-path()
+function url-path()
 {
     url-split $1 |cut -f4
 }
 
-url-anchor()
+function url-anchor()
 {
     url-split $1 |cut -f5
 }

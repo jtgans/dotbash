@@ -16,17 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-term-clear-to-eol()
+function term-clear-to-eol()
 {
 	echo -ne '\e[K'
 }
 
-term-clear-line()
+function term-clear-line()
 {
 	echo -ne '\r\e[K'
 }
 
-term-move-cursor()
+function term-move-cursor()
 {
 	local dir=$1
 	local dist=$2
@@ -49,36 +49,36 @@ term-move-cursor()
 	return 0
 }
 
-term-save-state()
+function term-save-state()
 {
 	echo -ne '\e7'
 }
 
-term-restore-state()
+function term-restore-state()
 {
 	echo -ne '\e8'
 }
 
-term-reset-color()
+function term-reset-color()
 {
     echo -ne '\e[0m'
 }
 
-term-set-fg()
+function term-set-fg()
 {
     local fg=$1
 
     term-set-attribs "3${1}"
 }
 
-term-set-bg()
+function term-set-bg()
 {
     local bg=$1
 
     term-set-attribs "4${1}"
 }
 
-term-set-attrib()
+function term-set-attrib()
 {
     local attrib=$1
 
@@ -96,7 +96,7 @@ term-set-attrib()
     term-set-attribs $attrib
 }
 
-term-set-attribs()
+function term-set-attribs()
 {
     local attrib
 
@@ -114,7 +114,7 @@ term-set-attribs()
     echo -ne "m"
 }
 
-term-show-colors()
+function term-show-colors()
 {
     local i=0
     local j=0

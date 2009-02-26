@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-in-string()
+function in-string()
 {
 	local string=$(get-by-varname $1)
 	local substring=$2
@@ -25,7 +25,7 @@ in-string()
     return $?
 }
 
-push-word()
+function push-word()
 {
 	local string_name=$1
 	local string_val=$(get-by-varname $string_name)
@@ -40,7 +40,7 @@ push-word()
 	fi
 }
 
-pop-word()
+function pop-word()
 {
 	local string_name=$1
 	local string_val=$(get-by-varname $string_name)

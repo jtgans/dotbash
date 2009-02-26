@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-run-hooks()
+function run-hooks()
 {
     local hooks=$(get-by-varname $1)
     local hook
@@ -33,7 +33,7 @@ run-hooks()
     fi
 }
 
-add-hook()
+function add-hook()
 {
     local hooks_varname=$1
     local hooks=$(get-by-varname $hooks_varname)
@@ -43,7 +43,7 @@ add-hook()
     set-by-varname $hooks_varname $hooks
 }
 
-remove-hook()
+function remove-hook()
 {
     local hooks_varname=$1
     local hooks=$(get-by-varname $1)

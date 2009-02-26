@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-gvman()
+function gvman()
 {
     local manpage=$1
     local tempfile=$(mktemp -t gvman.XXXXXXXX)

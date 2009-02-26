@@ -18,7 +18,7 @@
 
 export _IN_SCREEN=$([ ! -z "${WINDOW}" ] && echo true)
 
-in-screen()
+function in-screen()
 {
 	if [ ! -z "${_IN_SCREEN}" ]; then
 		return 0
@@ -27,20 +27,20 @@ in-screen()
 	fi
 }
 
-screen-set-window-title()
+function screen-set-window-title()
 {
 	if in-screen; then
 		echo -ne "\\ek$@\\e\\\\"
 	fi
 }
 
-screen-ssh-pre-hook()
+function screen-ssh-pre-hook()
 {
     local remotehost=$1
     screen-set-window-title $remotehost
 }
 
-screen-ssh-post-hook()
+function screen-ssh-post-hook()
 {
     screen-set-window-title $HOSTNAME
 }
