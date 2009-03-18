@@ -46,7 +46,7 @@ function project-cd()
 {
     local dir="$@"
 
-    if [ "$dir" == "~~" ]; then
+    if [ "$dir" == "~~" ] || [ "$dir" == "" ]; then
         if [ ! -z $_PROJECT_DIR ]; then
             builtin cd $_PROJECT_DIR
         else
@@ -74,7 +74,14 @@ function project()
 
         ${_PROJECT}-project-pre-hook
         project-set-dir $_PROJECT_DIR
-        $SHELL
+
+        if [ "$_ALT_SHELL" != "" ]; then
+            echo $_ALT_SHELL
+            $_ALT_SHELL
+        else
+            $SHELL
+        fi
+
         project-reset-dir
         ${_PROJECT}-project-post-hook
         
@@ -142,8 +149,10 @@ function new-project()
     local template
     local scm_type
     local scm_url
+    local directory
+    local no_editor
     local args=$(getopt \
-        -o ht:s:u:                      \
+        -o hnd:t:s:u:                   \
         --long help,template:,scm:,url: \
         -n new-project -- "$@")
 
@@ -154,6 +163,11 @@ function new-project()
             -h|--help)
                 echo "Usage: new-project <project_name> [-t <template>] [[-s <scm>] [-u <url>]]"
                 return 1
+                ;;
+
+            -d|--directory)
+                directory="$2"
+                shift 2
                 ;;
 
             -t|--template)
@@ -176,6 +190,11 @@ function new-project()
                 fi
                 ;;
 
+            -n|--no-editor)
+                no_editor=1
+                shift
+                ;;
+
             --)
                 shift
                 break
@@ -186,7 +205,7 @@ function new-project()
     project_name=$1
 
     if [ -z "$project_name" ]; then
-        echo "Usage: new-project <project_name> [-t <template>] [[-s <scm>] [-u <url>]]"
+        echo "Usage: new-project <project_name> [-n] [-d <dir>] [-t <template>] [[-s <scm>] [-u <url>]]"
         return 1
     fi
 
@@ -213,17 +232,26 @@ function new-project()
 
     project-pre-hook $project_name
     cat $_BASH_ETC/projects/templates/$template.template \
-        | sed s/@PROJECT@/$project_name/g                       \
+        | sed "s/@PROJECT@/$project_name/g"              \
         > $_BASH_ETC/projects/$project_name
 
-    project-editor-hook $project_name
-    $EDITOR $_BASH_ETC/projects/$project_name
+    if [ ! -z $directory ]; then
+        cat $_BASH_ETC/projects/$project_name                   \
+            | sed "s/^_PROJECT_DIR=.*/_PROJECT_DIR=$directory/" \
+            > $_BASH_ETC/projects/$project_name.tmp
+        mv $_BASH_ETC/projects/$project_name.tmp $_BASH_ETC/projects/$project_name
+    fi
 
-    if [ "$?" != "0" ]; then
-        echo "new-project: editor returned nonzero -- aborting build."
-        rm $_BASH_ETC/projects/$project_name
-        echo "new-project: some lingering files may have been left behind."
-        return 1
+    project-editor-hook $project_name
+    if [ -z $no_editor ]; then
+        $EDITOR $_BASH_ETC/projects/$project_name
+
+        if [ "$?" != "0" ]; then
+            echo "new-project: editor returned nonzero -- aborting build."
+            rm $_BASH_ETC/projects/$project_name
+            echo "new-project: some lingering files may have been left behind."
+            return 1
+        fi
     fi
 
     source $_BASH_ETC/projects/$project_name
@@ -311,6 +339,23 @@ function project-init-scm-git()
         git init
     else
         git clone $scm_url /tmp/new-project.$project_name.$$
+        find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
+        rmdir /tmp/new-project.$project_name.$$
+    fi
+    project-reset-dir
+}
+
+function project-init-scm-git-svn()
+{
+    local project_dir=$1
+    local scm_url=$2
+    
+    project-set-dir $project_dir
+    if [ -z "$scm_url" ]; then
+        echo "new-project: initting from SVN requires an scm_url."
+        return 1
+    else
+        git-svn clone $scm_url /tmp/new-project.$project_name.$$
         find /tmp/new-project.$project_name.$$ -mindepth 1 -maxdepth 1 -exec mv '{}' . ';'
         rmdir /tmp/new-project.$project_name.$$
     fi
