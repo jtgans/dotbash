@@ -151,6 +151,7 @@ function new-project()
     local scm_url
     local directory
     local no_editor
+    local usage="Usage: new-project <project_name> [-n] [-d <dir>] [-t <template>] [[-s <scm>] [-u <url>]]"
     local args=$(getopt \
         -o hnd:t:s:u:                   \
         --long help,template:,scm:,url: \
@@ -161,7 +162,7 @@ function new-project()
     while true; do
         case "$1" in
             -h|--help)
-                echo "Usage: new-project <project_name> [-t <template>] [[-s <scm>] [-u <url>]]"
+                echo $usage
                 return 1
                 ;;
 
@@ -205,7 +206,7 @@ function new-project()
     project_name=$1
 
     if [ -z "$project_name" ]; then
-        echo "Usage: new-project <project_name> [-n] [-d <dir>] [-t <template>] [[-s <scm>] [-u <url>]]"
+        echo $usage
         return 1
     fi
 
