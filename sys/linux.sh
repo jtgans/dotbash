@@ -68,4 +68,7 @@ if [ ! -z "$GEM_HOME" ]; then
     export PATH="${PATH}:$GEM_HOME/bin"
 fi
 
-daemonize-emacs
+if [ -z "$SSH_CLIENT" ]; then
+    daemonize-emacs
+fi
+
