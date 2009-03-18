@@ -26,6 +26,7 @@ alias ls='ls --color=auto -hsF'
 alias ll='ls -l'
 alias la='ls -A'
 alias dhelp='dhelp -f'
+alias bc='bc -l'
 
 # Setup an appropriate locale
 LANG=$(locale -a |grep en_US.utf8 |head -n 1)
