@@ -20,19 +20,27 @@ require pidofuser
 require ssh
 require x
 
+_EMACS_SERVER_FILE="$HOME/.emacs.d/server/server"
+
 function daemonize-emacs()
 {
     local pidof_emacs=$(pidofuser emacs)
+    local daemon_log=$(mktemp /tmp/.$USER.daemonize-emacs.XXXXXXXX)
 
     if [ -z "$pidof_emacs" ]; then
         echo -n "Daemonizing emacs: "
-        $(which emacs) --daemon 2>&1 2>/dev/null
+
+        [ -z "$_EMACS_SERVER_FILE" ] && rm $_EMACS_SERVER_FILE
+        $(which emacs) --daemon 2>&1 2>$daemon_log
 
         if [ "$?" == "0" ]; then
             echo $(which emacs)
         else
             echo failed.
+            cat $daemon_log
         fi
+
+        rm $daemon_log
     fi
 
     return 0
@@ -72,17 +80,16 @@ function emacs()
 function emacs-server-ssh-pre-hook()
 {
     local remotehost=$1; shift
-    local emacs_server_file=$HOME/.emacs.d/server/server
     local emacs_remote_port
 
-    if [ -f $emacs_server_file ]; then
-        emacs_remote_pid=$(cat $emacs_server_file \
+    if [ -f $_EMACS_SERVER_FILE ]; then
+        emacs_remote_pid=$(cat $_EMACS_SERVER_FILE \
             |head -1 |awk '{ print $2; }')
-        emacs_remote_port=$(cat $emacs_server_file \
+        emacs_remote_port=$(cat $_EMACS_SERVER_FILE \
             |head -1 |sed 's/:/ /' |awk '{ print $2; }')
 
         if kill -n 0 $emacs_remote_pid 2>/dev/null; then
-            export EMACS_REMOTE_DATA=$(cat $emacs_server_file)
+            export EMACS_REMOTE_DATA=$(cat $_EMACS_SERVER_FILE)
 
             ssh-hook-alter-ssh-args \
                 "$(ssh-hook-get-args)" \
