@@ -44,7 +44,7 @@ export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
 export EDITOR="$(which emacsclient) -c"
-export BROWSER="/usr/bin/elinks -remote %s"
+export BROWSER="/usr/bin/xulrunner-1.9 ${HOME}/Code/conkeror/application.ini"
 export LESS="-MRFX"
 export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
 
