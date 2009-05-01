@@ -76,7 +76,6 @@ function project()
         project-set-dir $_PROJECT_DIR
 
         if [ "$_ALT_SHELL" != "" ]; then
-            echo $_ALT_SHELL
             $_ALT_SHELL
         else
             $SHELL
@@ -89,6 +88,7 @@ function project()
         remove-hook _INIT_POST_HOOKS project-init-hook
         unset _PROJECT
         unset _PROJECT_DIR
+        unset _ALT_SHELL
     else
         echo "No such project $project_name."
         return 1
