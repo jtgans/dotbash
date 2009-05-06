@@ -41,9 +41,10 @@ function switch-chroot()
     local chroot_name
     local chroot_path
     local home_dir
+    local prefix_command
     local user_to_become=$USER
-    local usage="Usage: switch-chroot <chroot_name> [-r] [-u <username>]"
-    local args=$(getopt -o hru: --long help,root,user: -n switch-chroot -- "$@")
+    local usage="Usage: switch-chroot <chroot_name> [-r] [-u <username>] [-c <prefix_command>]"
+    local args=$(getopt -o hru:c: --long help,root,user,prefix-command: -n switch-chroot -- "$@")
         
     eval set -- "$args"
 
@@ -64,6 +65,11 @@ function switch-chroot()
                 shift 2
                 ;;
 
+            -c|--prefix-command)
+                prefix_command="$2"
+                shift 2
+                ;;
+                
             --)
                 shift
                 break
@@ -100,7 +106,7 @@ function switch-chroot()
 
     push-word _INSIDE_CHROOT $chroot_name
     echo $_INSIDE_CHROOT | sudo tee $chroot_path$_CHROOT_FILE >/dev/null
-    sudo chroot $chroot_path /bin/su -l -p $user_to_become
+    sudo $prefix_command chroot $chroot_path /bin/su -l -p $user_to_become
     pop-word _INSIDE_CHROOT $chroot_name
     echo $_INSIDE_CHROOT | sudo tee $chroot_path$_CHROOT_FILE >/dev/null
 
@@ -126,10 +132,10 @@ function sync-chroot()
         return 1
     fi
 
-    sudo cp /etc/{passwd,shadow,group}    $chroot_path/etc
-    sudo cp /etc/resolv.conf              $chroot_path/etc
-    echo $chroot_name                     | sudo tee $chroot_path/etc/hostname >/dev/null
-    echo 127.0.0.1 localhost $chroot_name | sudo tee $chroot_path/etc/hosts    >/dev/null
+    sudo cp /etc/{passwd,shadow,group}   $chroot_path/etc
+    sudo cp /etc/resolv.conf             $chroot_path/etc
+    echo $(hostname)                     | sudo tee $chroot_path/etc/hostname >/dev/null
+    echo 127.0.0.1 localhost $(hostname) | sudo tee $chroot_path/etc/hosts    >/dev/null
 }
 
 function list-chroots()

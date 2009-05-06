@@ -31,7 +31,13 @@ function daemonize-emacs()
         echo -n "Daemonizing emacs: "
 
         [ -z "$_EMACS_SERVER_FILE" ] && rm $_EMACS_SERVER_FILE
-        $(which emacs) --daemon 2>&1 2>$daemon_log
+
+        if [ -z "$(which emacs)" ]; then
+            echo no emacs to daemonize.
+            return 1
+        else
+            $(which emacs) --daemon 2>&1 2>$daemon_log
+        fi
 
         if [ "$?" == "0" ]; then
             echo $(which emacs)
@@ -99,4 +105,11 @@ function emacs-server-ssh-pre-hook()
             unset EMACS_REMOTE_DATA
         fi
     fi
+}
+
+function emacs-set-eterm-dir {
+    echo -e "\033AnSiTu" $(whoami)
+    echo -e "\033AnSiTc" $(pwd)
+    echo -e "\033AnSiTh" $(hostname -f)
+    history -a
 }

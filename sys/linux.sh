@@ -44,7 +44,7 @@ export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
 export EDITOR="$(which emacsclient) -c"
-export BROWSER="/usr/bin/xulrunner-1.9 ${HOME}/Code/conkeror/application.ini"
+export BROWSER="/usr/bin/xulrunner ${HOME}/Code/conkeror/application.ini"
 export LESS="-MRFX"
 export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
 
@@ -73,3 +73,7 @@ if [ -z "$SSH_CLIENT" ]; then
     daemonize-emacs
 fi
 
+# track directory, username, and cwd for remote logons
+if [ "$TERM" == "eterm-color" ]; then
+    PROMPT_COMMAND="$PROMPT_COMMAND; emacs-set-eterm-dir"
+fi
