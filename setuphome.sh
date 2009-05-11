@@ -62,7 +62,7 @@ function setup-links()
     try source .dotfiles/setuplinks.sh
 }
 
-require git "git not available."
+require-command git "git not available."
 
 in-dir $HOME setup-dirs
 in-dir $HOME setup-repos
