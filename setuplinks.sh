@@ -5,6 +5,6 @@
 [ -f $HOME/.bashrc ] && rm $HOME/.bashrc
 [ -f $HOME/.bash_logout ] && rm $HOME/.bash_logout
 
-ln -s bash_profile ../.bash_profile
-ln -s bashrc ../.bashrc
+ln -s $HOME/.bash.d/bash_profile $HOME/.bash_profile
+ln -s $HOME/.bash.d/bashrc $HOME/.bashrc
 
