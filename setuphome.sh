@@ -62,6 +62,8 @@ function setup-links()
     try source .dotfiles/setuplinks.sh
 }
 
+COMMAND_NAME="setuphome"
+
 require-command git "git not available."
 
 in-dir $HOME setup-dirs
