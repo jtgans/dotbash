@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 require term
+require hooks
 
 export _CHROOT_ROOT_PATH=$HOME/chroots
 export _CHROOT_FILE=/.chroot
