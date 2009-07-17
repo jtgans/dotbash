@@ -18,6 +18,7 @@
 
 require term
 require url
+require sdk
 
 function project-set-prompt()
 {
