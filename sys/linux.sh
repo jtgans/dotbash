@@ -40,7 +40,7 @@ export LANG
 
 export LC_COLLATE=C
 export PROMPT_COMMAND='history -a'
-export PATH="${HOME}/.bin:/usr/local/symlinks:${PATH}:/usr/local/scripts"
+export PATH="${HOME}/.bin:/usr/local/bin:${PATH}"
 export PAGER="/usr/bin/less"
 export P4CONFIG=".p4config"
 export EDITOR="$(which emacsclient) -c"
