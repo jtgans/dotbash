@@ -42,7 +42,6 @@ export LC_COLLATE=C
 export PROMPT_COMMAND='history -a'
 export PATH="${HOME}/.bin:/usr/local/bin:${PATH}"
 export PAGER="/usr/bin/less"
-export P4CONFIG=".p4config"
 export EDITOR="$(which emacsclient) -c -a $(which vim || which vi)"
 export BROWSER="/usr/bin/xulrunner ${HOME}/Code/conkeror/application.ini"
 export LESS="-MRFX"
