@@ -235,6 +235,8 @@ function new-project()
     project-pre-hook $project_name
     cat $_BASH_ETC/projects/templates/$template.template \
         | sed "s/@PROJECT@/$project_name/g"              \
+        | sed "s/@AUTHOR@/$FULL_NAME/g"                  \
+        | sed "s/@EMAIL@/$EMAIL/g"                       \
         > $_BASH_ETC/projects/$project_name
 
     if [ ! -z $directory ]; then
