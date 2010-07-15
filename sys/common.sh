@@ -19,6 +19,8 @@
 umask 022
 
 export HISTCONTROL="ignoredups:erasedups"
+export FULL_NAME="June Tate-Gans"
+export EMAIL="june@theonelab.com"
 
 shopt -s checkhash
 shopt -s checkwinsize
