@@ -76,3 +76,6 @@ fi
 if [ "$TERM" == "eterm-color" ]; then
     PROMPT_COMMAND="$PROMPT_COMMAND; emacs-set-eterm-dir"
 fi
+
+ssh-agent
+

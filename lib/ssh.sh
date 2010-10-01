@@ -17,6 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 require hooks
+require pidofuser
 
 export ssh_pre_hooks=""
 export ssh_post_hooks=""
@@ -79,3 +80,35 @@ function ssh()
 
     return $return_code
 }
+
+function ssh-agent() {
+    local ssh_agent=$(which ssh-agent)
+    local ssh_add=$(which ssh-add)
+    local ssh_agent_script
+
+    if [ -z "$ssh_agent" ]; then
+        echo "ssh-agent not available."
+	return 1
+    fi
+
+    if [ -f $HOME/.ssh_agent ] && [ ! -z "$(pidofuser ssh-agent $USER)" ]; then
+        ssh_agent_script=$(cat $HOME/.ssh_agent)
+	eval $ssh_agent_script
+	return 0
+    fi
+
+    ssh_agent_script=$($ssh_agent)
+    eval $ssh_agent_script
+    echo "${ssh_agent_script}" > $HOME/.ssh_agent
+    chmod 0600 $HOME/.ssh_agent
+
+    if [ -z "$SSH_CLIENT" ]; then
+        $ssh_add -l >/dev/null
+        if [ "$?" != "0" ]; then
+            $ssh_add
+        fi
+    fi
+
+    return 0
+}
+
