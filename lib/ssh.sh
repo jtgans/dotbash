@@ -86,7 +86,7 @@ function ssh-agent() {
     local ssh_add=$(which ssh-add)
     local ssh_agent_script
 
-    if is-interactive; then
+    if is-interactive || [ ! -z "$SSH_CLIENT" ]; then
         return 0
     fi
 
