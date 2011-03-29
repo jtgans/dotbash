@@ -43,7 +43,7 @@ export PROMPT_COMMAND='history -a'
 export PATH="${HOME}/.bin:/usr/local/bin:${PATH}"
 export PAGER="/usr/bin/less"
 export EDITOR="$(which emacsclient) -c -a $(which vim || which vi)"
-export BROWSER="/usr/bin/xulrunner ${HOME}/Code/conkeror/application.ini"
+export BROWSER=""
 export LESS="-MRFX"
 export HISTTIMEFORMAT="%m/%d/%Y %H:%M:%S "
 
