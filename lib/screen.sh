@@ -37,10 +37,15 @@ function screen-set-window-title()
 function screen-ssh-pre-hook()
 {
     local remotehost=$1
-    screen-set-window-title $remotehost
+    
+    if in-screen; then
+        screen-set-window-title $remotehost
+    fi
 }
 
 function screen-ssh-post-hook()
 {
-    screen-set-window-title $HOSTNAME
+    if in-screen; then
+        screen-set-window-title $HOSTNAME
+    fi
 }
