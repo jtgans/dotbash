@@ -54,7 +54,7 @@ export DEBEMAIL="june@theonelab.com"
 export DEBFULLNAME="June Tate-Gans"
 
 if in-screen; then
-    export TERM="screen"
+    export TERM="xterm-256color"
     unset TERMCAP  # Fix broken ncurses behavior
 
     add-hook ssh_pre_hooks screen-ssh-pre-hook
