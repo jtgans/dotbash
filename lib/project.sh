@@ -18,7 +18,10 @@
 
 require term
 require url
-require sdk
+require hooks
+
+export project_pre_hooks=""
+export project_post_hooks=""
 
 function project-set-prompt()
 {
@@ -73,6 +76,7 @@ function project()
         add-hook _INIT_POST_HOOKS project-init-hook
         add-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
 
+        run-hooks project_pre_hooks
         ${_PROJECT}-project-pre-hook
         project-set-dir $_PROJECT_DIR
 
@@ -84,6 +88,7 @@ function project()
 
         project-reset-dir
         ${_PROJECT}-project-post-hook
+        run-hooks project_post_hooks
         
         remove-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
         remove-hook _INIT_POST_HOOKS project-init-hook
@@ -218,6 +223,11 @@ function new-project()
     if [ ! -f $_BASH_ETC/projects/templates/$template.template ]; then
         echo "new-project: template $template not found."
         return 1
+    fi
+
+    if [ -f $_BASH_ETC/projects/$project_name ]; then
+    	echo "new-project: project $project_name aleady exists. Use rm-project to remove it first."
+	return 1
     fi
 
     if [ ! -z "$scm_type" ]; then

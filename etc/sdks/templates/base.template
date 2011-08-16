@@ -18,4 +18,29 @@
 
 _SDK_DIR=~/SDKs/@SDK@
 
-# Do some helpful initialization of env vars and whathaveyou here.
+function @SDK@-sdk-init-hook()
+{
+    : Initialize your env vars here.
+    : Be sure to save what you change for reversion later.
+    : 
+    : CHANGES MUST BE IDEMPOTENT!
+
+    export _@SDK@_OLD_PATH="$PATH"
+    export _@SDK@_OLD_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+
+    export PATH="$PATH:$_SDK_DIR/bin"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$_SDK_DIR/lib"
+}
+
+function @SDK@-sdk-shutdown-hook()
+{
+    : Restore any env vars you changed here.
+    : Be sure to unset the old vars you used.
+    : 
+    : CHANGES MUST BE IDEMPOTENT!
+
+    export PATH="$_@SDK@_OLD_PATH"
+    export LD_LIBRARY_PATH="$_@SDK@_OLD_LD_LIBRARY_PATH"
+
+    unset _@SDK@_OLD_PATH _@SDK@_OLD_LD_LIBRARY_PATH
+}
