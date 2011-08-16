@@ -100,7 +100,7 @@ function emacs-server-ssh-pre-hook()
             ssh-hook-alter-ssh-args \
                 "$(ssh-hook-get-args)" \
                 "-oSendEnv=EMACS_REMOTE_DATA" \
-                "-L${emacs_remote_port}:localhost:${emacs_remote_port}"
+                "-R${emacs_remote_port}:localhost:${emacs_remote_port}"
 
             unset EMACS_REMOTE_DATA
         fi
