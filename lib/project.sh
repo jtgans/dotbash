@@ -50,8 +50,8 @@ function project-cd()
 {
     local dir="$@"
 
-    if [ "$dir" == "~~" ] || [ "$dir" == "" ]; then
-        if [ ! -z $_PROJECT_DIR ]; then
+    if [[ "$dir" == "~~" ]] || [[ "$dir" == "" ]]; then
+        if [[ ! -z $_PROJECT_DIR ]]; then
             builtin cd $_PROJECT_DIR
         else
             echo "$0: no project set."
@@ -65,12 +65,12 @@ function project()
 {
     local project_name=$1
     
-    if [ "$project_name" == "" ]; then
+    if [[ "$project_name" == "" ]]; then
         echo "Usage: project <project_name>"
         return 1
     fi
 
-    if [ -f $_BASH_ETC/projects/$project_name ]; then
+    if [[ -f $_BASH_ETC/projects/$project_name ]]; then
         export _PROJECT=$project_name
         source $_BASH_ETC/projects/$project_name
         add-hook _INIT_POST_HOOKS project-init-hook
@@ -80,7 +80,7 @@ function project()
         ${_PROJECT}-project-pre-hook
         project-set-dir $_PROJECT_DIR
 
-        if [ "$_ALT_SHELL" != "" ]; then
+        if [[ "$_ALT_SHELL" != "" ]]; then
             $_ALT_SHELL
         else
             $SHELL
@@ -105,10 +105,10 @@ function edit-project()
 {
     local project_name=$1
 
-    if [ -z "$project_name" ]; then
+    if [[ -z "$project_name" ]]; then
         echo "Usage: edit-project <project_name>"
     else
-        if [ -f $_BASH_ETC/projects/$project_name ]; then
+        if [[ -f $_BASH_ETC/projects/$project_name ]]; then
             $EDITOR $_BASH_ETC/projects/$project_name
         else
             echo "No such project $project_name."
@@ -119,7 +119,7 @@ function edit-project()
 function list-projects()
 {
     for i in $_BASH_ETC/projects/*; do
-        if [ -f $i ]; then
+        if [[ -f $i ]]; then
             echo $(basename $i)
         fi
     done
@@ -129,17 +129,17 @@ function rm-project()
 {
     local project_name=$1
 
-    if [ -z "$project_name" ]; then
+    if [[ -z "$project_name" ]]; then
         echo "Usage: rm-project <project_name>"
     else
-        if [ ! -f $_BASH_ETC/projects/$project_name ]; then
+        if [[ ! -f $_BASH_ETC/projects/$project_name ]]; then
             echo "No such project $project_name."
             return 1
         fi
 
         source $_BASH_ETC/projects/$project_name
         
-        if [ -d $_PROJECT_DIR ]; then
+        if [[ -d $_PROJECT_DIR ]]; then
             rm -rf $_PROJECT_DIR
         fi
 
@@ -158,37 +158,34 @@ function new-project()
     local directory
     local no_editor
     local usage="Usage: new-project <project_name> [-n] [-d <dir>] [-t <template>] [[-s <scm>] [-u <url>]]"
-    local args=$(getopt \
-        -o hnd:t:s:u:                   \
-        --long help,template:,scm:,url: \
-        -n new-project -- "$@")
+    local args=$(getopt hnd:t:s:u: $*)
 
-    eval set -- "$args"
+    set -- $args
 
-    while true; do
+    for i; do
         case "$1" in
-            -h|--help)
+            -h)  # help
                 echo $usage
                 return 1
                 ;;
 
-            -d|--directory)
+            -d)  # directory
                 directory="$2"
                 shift 2
                 ;;
 
-            -t|--template)
+            -t)  # template
                 template="$2"
                 shift 2
                 ;;
 
-            -s|--scm)
+            -s)  # scm
                 scm_type="$2"
                 shift 2
                 ;;
 
-            -u|--url)
-                if [ -z "$scm_type" ]; then
+            -u)  # url
+                if [[ -z "$scm_type" ]]; then
                     echo "new-project: SCM URL requires an SCM type."
                     return 1
                 else
@@ -197,7 +194,7 @@ function new-project()
                 fi
                 ;;
 
-            -n|--no-editor)
+            -n)  # no-editor
                 no_editor=1
                 shift
                 ;;
@@ -211,26 +208,26 @@ function new-project()
 
     project_name=$1
 
-    if [ -z "$project_name" ]; then
+    if [[ -z "$project_name" ]]; then
         echo $usage
         return 1
     fi
 
-    if [ -z "$template" ]; then
+    if [[ -z "$template" ]]; then
         template=base
     fi
 
-    if [ ! -f $_BASH_ETC/projects/templates/$template.template ]; then
+    if [[ ! -f $_BASH_ETC/projects/templates/$template.template ]]; then
         echo "new-project: template $template not found."
         return 1
     fi
 
-    if [ -f $_BASH_ETC/projects/$project_name ]; then
+    if [[ -f $_BASH_ETC/projects/$project_name ]]; then
     	echo "new-project: project $project_name aleady exists. Use rm-project to remove it first."
-	return 1
+	    return 1
     fi
 
-    if [ ! -z "$scm_type" ]; then
+    if [[ ! -z "$scm_type" ]]; then
         if ! function-p project-init-scm-${scm_type}; then
             echo "SCM not supported."
             return 1
@@ -238,7 +235,7 @@ function new-project()
     fi
 
     project-reset-hooks
-    if [ -f $_BASH_ETC/projects/templates/$template.sh ]; then
+    if [[ -f $_BASH_ETC/projects/templates/$template.sh ]]; then
         source $_BASH_ETC/projects/templates/$template.sh
     fi
 
@@ -249,7 +246,7 @@ function new-project()
         | sed "s/@EMAIL@/$EMAIL/g"                       \
         > $_BASH_ETC/projects/$project_name
 
-    if [ ! -z $directory ]; then
+    if [[ ! -z $directory ]]; then
         cat $_BASH_ETC/projects/$project_name                   \
             | sed "s/^_PROJECT_DIR=.*/_PROJECT_DIR=$directory/" \
             > $_BASH_ETC/projects/$project_name.tmp
@@ -257,10 +254,15 @@ function new-project()
     fi
 
     project-editor-hook $project_name
-    if [ -z $no_editor ]; then
+    if [[ -z $no_editor ]]; then
+        if [[ -z $EDITOR ]]; then
+            echo "new-project: EDITOR environment variable is not set."
+            return 1
+        fi
+        
         $EDITOR $_BASH_ETC/projects/$project_name
 
-        if [ "$?" != "0" ]; then
+        if [[ "$?" != "0" ]]; then
             echo "new-project: editor returned nonzero -- aborting build."
             rm $_BASH_ETC/projects/$project_name
             echo "new-project: some lingering files may have been left behind."
@@ -271,7 +273,7 @@ function new-project()
     source $_BASH_ETC/projects/$project_name
 
     project-pre-scm-hook $project_name $_PROJECT_DIR $scm_type $scm_url
-    if [ ! -z "$scm_type" ]; then
+    if [[ ! -z "$scm_type" ]]; then
         project-init-scm-${scm_type} $_PROJECT_DIR $scm_url
     fi
     project-post-scm-hook $project_name $_PROJECT_DIR $scm_type $scm_url
@@ -285,21 +287,21 @@ function new-project-template()
     local name=$1
     local base=$2
 
-    if [ -z "$name" ]; then
+    if [[ -z "$name" ]]; then
         echo "Usage: new-project-template <template_name> [<base_name>]"
         return 1
     fi
 
-    if [ -z "$base" ]; then
+    if [[ -z "$base" ]]; then
         base="base"
     fi
 
-    if [ ! -f $_BASH_ETC/projects/templates/$base.template ]; then
+    if [[ ! -f $_BASH_ETC/projects/templates/$base.template ]]; then
         echo "No template by the name $base was found."
         return 1
     fi
 
-    if [ -f $_BASH_ETC/projects/templates/$name.template ]; then
+    if [[ -f $_BASH_ETC/projects/templates/$name.template ]]; then
         echo "Template $name already exists."
         return 1
     fi
@@ -323,7 +325,7 @@ function project-reset-hooks()
 
 function project-init-hook()
 {
-    if [ ! -z "$_PROJECT" ]; then
+    if [[ ! -z "$_PROJECT" ]]; then
         source $_BASH_ETC/projects/$_PROJECT
     fi
 }
@@ -333,7 +335,7 @@ if builtin complete >/dev/null 2>/dev/null; then
     {
         local cur=${COMP_WORDS[COMP_CWORD]}
         COMPREPLY=()
-        if [ $COMP_CWORD -eq 1 ]; then
+        if [[ $COMP_CWORD -eq 1 ]]; then
             COMPREPLY=( $(compgen -W "$(list-projects)" $cur) )
         fi
     }
@@ -349,7 +351,7 @@ function project-init-scm-git()
     local scm_url=$2
 
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         git init
     else
         git clone $scm_url /tmp/new-project.$project_name.$$
@@ -365,7 +367,7 @@ function project-init-scm-git-svn()
     local scm_url=$2
     
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         echo "new-project: initting from SVN requires an scm_url."
         return 1
     else
@@ -382,7 +384,7 @@ function project-init-scm-hg()
     local scm_url=$2
 
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         hg init
     else
         hg clone $scm_url /tmp/new-project.$project_name.$$
@@ -400,15 +402,15 @@ function project-init-scm-tla()
     local archive_name=$(tla archives |grep -B1 $scm_url |head -1)
 
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         tla init-tree $project_name--main--0
     else
-        if [ ! -z "$archive_name" ]; then
+        if [[ ! -z "$archive_name" ]]; then
             echo "$scm_url already registered as $archive_name"
         else
             result=$(tla register-archive $scm_url)
 
-            if [ "$?" != "0" ]; then
+            if [[ "$?" != "0" ]]; then
                 echo "Unable to register $scm_url. Aborting."
                 return 1
             fi
@@ -417,10 +419,10 @@ function project-init-scm-tla()
             echo "$scm_url registered as $archive_name"
         fi
 
-        if [ ! -z "$tla_branch" ]; then
+        if [[ ! -z "$tla_branch" ]]; then
             tla get -A $archive_name $tla_branch /tmp/new-project.$project_name.$$
 
-            if [ "$?" != "0" ]; then
+            if [[ "$?" != "0" ]]; then
                 echo "Unable to get $tla_branch from $archive_name. Aborting."
                 return 1
             fi
@@ -440,7 +442,7 @@ function project-init-scm-svn()
     local scm_url=$2
 
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         echo "new-project: initting from SVN requires an scm_url."
         return 1
     else
@@ -461,11 +463,11 @@ function project-init-scm-cvs()
     local hostpart
 
     project-set-dir $project_dir
-    if [ -z "$scm_url" ]; then
+    if [[ -z "$scm_url" ]]; then
         echo "new-project: initting from CVS requires an scm_url."
         return 1
     else
-        if [ ! -z $user ]; then
+        if [[ ! -z $user ]]; then
             hostpart="$user@$host"
         else
             hostpart=$host
@@ -475,7 +477,7 @@ function project-init-scm-cvs()
         pushd /tmp/new-project.$project_name.$$ >/dev/null
         cvs -z3 -d:$method:$hostpart:$path co $module
         
-        if [ "$?" != "0" ]; then
+        if [[ "$?" != "0" ]]; then
             echo "Unable to get $module from $scm_url. Aborting."
             return 1
         fi
