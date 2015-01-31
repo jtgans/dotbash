@@ -54,11 +54,9 @@ function source-dir()
         local libname=$(basename $i |sed 's/\.sh$//')
 
         is-interactive && echo -n "Loading library: "
-        is-interactive && term-save-state
         is-interactive && echo -n $libname
 
         if require $libname; then
-            is-interactive && term-restore-state
             is-interactive && term-clear-line
         else
             is-interactive && echo -e " ... failed"
