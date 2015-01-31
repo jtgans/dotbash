@@ -18,12 +18,13 @@
 
 function term-clear-to-eol()
 {
-	echo -ne '\e[K'
+    tput ce
 }
 
 function term-clear-line()
 {
-	echo -ne '\r\e[K'
+	echo -ne '\r'
+    tput ce
 }
 
 function term-move-cursor()
@@ -35,10 +36,10 @@ function term-move-cursor()
 	[ -z "$dist" ] && dist=1
 
 	case $dir in
-		up)	cmd=$(echo -ne '\e[1A')	;;
-		down)	cmd=$(echo -ne '\e[1B')	;;
-		left)	cmd=$(echo -ne '\e[1C')	;;
-		right)	cmd=$(echo -ne '\e[1D')	;;
+		up)	    cmd=$(tput up)	;;
+		down)	cmd=$(tput do)	;;
+		left)	cmd=$(tput le)	;;
+		right)	cmd=$(tput nd)	;;
 		*)	return 1 ;;
 	esac
 
@@ -49,33 +50,32 @@ function term-move-cursor()
 	return 0
 }
 
-function term-save-state()
-{
-	echo -ne '\e7'
-}
-
-function term-restore-state()
-{
-	echo -ne '\e8'
-}
-
 function term-reset-color()
 {
-    echo -ne '\e[0m'
+    tput sgr0
+}
+
+function term-set-color()
+{
+    local fg=$1; shift
+    local bg=$1; shift
+
+    term-set-fg $fg
+    term-set-bg $bg
 }
 
 function term-set-fg()
 {
     local fg=$1
 
-    term-set-attribs "3${1}"
+    tput setaf "${fg}"
 }
 
 function term-set-bg()
 {
     local bg=$1
 
-    term-set-attribs "4${1}"
+    tput setab "${bg}"
 }
 
 function term-set-attrib()
@@ -83,50 +83,35 @@ function term-set-attrib()
     local attrib=$1
 
     case "$attrib" in
-        reset)      attrib=0 ;;
-        bright)     attrib=1 ;;
-        dim)        attrib=2 ;;
-        underscore) attrib=4 ;;
-        blink)      attrib=5 ;;
-        reverse)    attrib=6 ;;
-        hidden)     attrib=8 ;;
+        reset)      tput sgr0 ;;
+        bright)     tput md ;;
+        dim)        tput mh ;;
+        underscore) tput us ;;
+        blink)      tput mb ;;
+        reverse)    tput mr ;;
+        hidden)     tput mk ;;
         *)          return 0 ;;
     esac
-
-    term-set-attribs $attrib
-}
-
-function term-set-attribs()
-{
-    local attrib
-
-    if [ "$#" == "0" ]; then
-        return 0
-    fi
-
-    echo -ne "\\e["
-    while [ "$#" != "0" ]; do
-        attrib=$1; shift
-
-        echo -ne $attrib
-        [ "$#" != "0" ] && echo -ne ";"
-    done
-    echo -ne "m"
 }
 
 function term-show-colors()
 {
+    local maxcolor=$(($(tput colors) + 1))
+    local basemaxcolor=$maxcolor
+    local maxcolorlen=$(($(echo $maxcolor |wc -c) - 1))
     local i=0
     local j=0
 
-    while [ $i -lt 10 ]; do
-        while [ $j -lt 10 ]; do
+    [[ $basemaxcolor -ge 16 ]] && basemaxcolor=16
+
+    while [ $i -lt $basemaxcolor ]; do
+        while [ $j -lt $basemaxcolor ]; do
             term-reset-color
             term-set-color $i $j
-            echo -n "$i $j"
+            printf "%2d %2d" $i $j
             term-reset-color
 
-            echo -ne "\t"
+            echo -ne " "
 
             j=$((j + 1))
         done
@@ -136,4 +121,25 @@ function term-show-colors()
         i=$((i + 1))
         j=0
     done
+
+    if [[ $maxcolor -ge 256 ]]; then
+        echo
+
+        while [[ $i -lt $maxcolor ]]; do
+            term-reset-color
+            term-set-color 0 $i
+            printf "%${maxcolorlen}d" $i
+            term-reset-color
+
+            if [[ $((($i - 15) % 24)) -eq 0 ]]; then
+                echo
+            else
+                echo -n ' '
+            fi
+
+            i=$((i + 1))
+        done
+
+        echo
+    fi
 }
