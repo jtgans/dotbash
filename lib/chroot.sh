@@ -45,28 +45,28 @@ function switch-chroot()
     local prefix_command
     local user_to_become=$USER
     local usage="Usage: switch-chroot <chroot_name> [-r] [-u <username>] [-c <prefix_command>]"
-    local args=$(getopt -o hru:c: --long help,root,user,prefix-command: -n switch-chroot -- "$@")
+    local args=$(getopt hru:c: $*)
         
-    eval set -- "$args"
+    set -- $args
 
-    while true; do
+    for i; do
         case "$1" in
-            -h|--help)
+            -h)  # help
                 echo $usage
                 return 1
                 ;;
 
-            -r|--root)
+            -r)  # root
                 user_to_become=root
                 shift
                 ;;
             
-            -u|--user)
+            -u)  # user
                 user_to_become="$2"
                 shift 2
                 ;;
 
-            -c|--prefix-command)
+            -c)  # prefix_command
                 prefix_command="$2"
                 shift 2
                 ;;
