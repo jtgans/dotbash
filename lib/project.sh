@@ -101,6 +101,78 @@ function project()
     fi
 }
 
+function in-project()
+{
+    local project_name
+    local commands
+    local chdir
+    local usage="Usage: in-project [-h] [-c <dir>] <project_name> <commands...>"
+    local args=$(getopt hc: $*)
+
+    set -- $args
+
+    for i; do
+        case "$1" in
+            -c)  # chdir
+                chdir="$2"
+                shift 2
+                ;;
+
+            --)
+                shift
+                break
+                ;;
+
+            -h|*)  # help
+                echo $usage
+                return 1
+                ;;
+        esac
+    done
+
+    project_name=$1; shift
+    commands="$@"
+
+    if [[ "$project_name" == "" ]]; then
+        echo "Usage: in-project <project_name> <commands...>"
+        return 1
+    fi
+
+    if [[ -f $_BASH_ETC/projects/$project_name ]]; then
+        export _PROJECT=$project_name
+        source $_BASH_ETC/projects/$project_name
+        add-hook _INIT_POST_HOOKS project-init-hook
+        add-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
+
+        run-hooks project_pre_hooks
+        ${_PROJECT}-project-pre-hook
+        project-set-dir $_PROJECT_DIR
+
+        if [[ ! -z "$chdir" ]]; then
+            commands="cd \"$chdir\"; $commands"
+        fi
+
+        if [[ "$_ALT_SHELL" != "" ]]; then
+            $_ALT_SHELL -c "${commands}"
+        else
+            $SHELL -c "${commands}"
+        fi
+
+        project-reset-dir
+        ${_PROJECT}-project-post-hook
+        run-hooks project_post_hooks
+
+        remove-hook _INIT_POST_HOOKS ${_PROJECT}-project-init-hook
+        remove-hook _INIT_POST_HOOKS project-init-hook
+        unset _PROJECT
+        unset _PROJECT_DIR
+        unset _ALT_SHELL
+    else
+        echo "No such project $project_name."
+        return 1
+    fi
+}
+
 function edit-project()
 {
     local project_name=$1
