@@ -1,0 +1,37 @@
+* Bash init framework
+
+This repo contains my years of collected bash frameworks and configuration code.
+This code has all been battle-tested on Linux, Mac, and yes, even Cygwin
+systems.
+
+The most recently tested code is for Mac systems, Linux works definitely, but
+Cygwin has likely bitrotted some.
+
+** Overall design
+
+The idea was to put as much as I could into bash functions to reduce =fork(2)=
+costs to other programs and re-use as much of the environment as possible. As a
+result, the functions I have built produce an almost lisp-like environment where
+I can meddle about easily.
+
+I built a dependency-based bootstrapping system using a function called
+"require" that only loads libraries from lib/ on demand.
+
+Each host system has its own init scripts in sys/, and function generated data
+is stored in etc/.
+
+The crown jewels of this mess is the =project= command, along with =new-project=
+and its ilk. These little chunks allow you to define whole operating
+environments specific to a software project, and to even clone them from source.
+The corollary to this is the =use-sdk= command, which allows you to define
+per-SDK environments as well.
+
+** How the heck do I use this pile?
+
+Like this:
+
+  - =$ git clone https://github.com/jtgans/dotbash.git ~/.bash.d=
+  - =$ ln -sf ~/.bash.d/init.sh ~/.bashrc=
+  - =$ ln -sf ~/.bash.d/init.sh ~/.bash_profile=
+
+Relog.
