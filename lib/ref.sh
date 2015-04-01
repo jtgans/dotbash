@@ -9,6 +9,15 @@
 #       [bin]
 #       [linenums]
 
+function ref-join()
+{
+    local separator="$1"; shift
+    local -a args=($@)
+    local regex="$(printf -- "${separator}%s" "${args[@]}")"
+    regex="${regex:${#separator}}"
+    echo "${regex}"
+}
+
 function ref-usage() {
     cat >/dev/stderr <<EOF
 Usage: ref [lang [(c|c++|objc|java|make|proto|header),...]]
@@ -105,7 +114,7 @@ function ref-ref() {
         done
 
         IFS=$oldifs
-        extension_predicate="-iname $(join " -or -iname " "${extensions[@]}")"
+        extension_predicate="-iname $(ref-join " -or -iname " "${extensions[@]}")"
     fi
 
     # FIXME: Don't use eval here.
