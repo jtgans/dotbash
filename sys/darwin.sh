@@ -1,10 +1,18 @@
 # -*- sh -*-
 
+require hooks
+
 alias ls='ls -Gsph'
 alias ll='ls -l'
 alias la='ls -A'
 
-export PROMPT_COMMAND='history -a; history -n'
+function history-append-and-reload() {
+    history -a
+    history -n
+}
+
+add-hook _PROMPT_HOOKS history-append-and-reload
+
 export PATH="${HOME}/.bin:${PATH}"
 export PAGER="/usr/bin/less"
 

@@ -12,3 +12,6 @@ shopt -s cmdhist
 shopt -s extglob
 shopt -s hostcomplete
 shopt -s histappend
+
+export _PROMPT_HOOKS=""
+export PROMPT_COMMAND="run-hooks _PROMPT_HOOKS"
