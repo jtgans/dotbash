@@ -3,17 +3,50 @@
 require term
 require url
 require hooks
+require git
 
 export project_pre_hooks=""
 export project_post_hooks=""
+export project_scm_prompt=""
+
+function project-scm-prompt-git()
+{
+    local reset=$(term-reset-color)
+    local branch_color=$(term-set-attrib bright; term-set-fg 2)
+    local dirty_color=$(term-set-attrib bright; term-set-fg 3)
+    local output=""
+
+    if git-is-dirty; then
+        echo -n "\\[${dirty_color}\\]*\\[${reset}\\]"
+    fi
+
+    local status=$(git-get-status)
+    local branch=$(git-extract-branch $status)
+    echo -n "\\[${branch_color}\\]${branch}\\[${reset}\\]"
+
+    local aheadbehind=$(git-extract-ahead-behind $status)
+    if [[ ! -z $aheadbehind ]]; then
+        echo -n " (\\[${dirty_color}\\]${aheadbehind}\\[${reset}\\])"
+    fi
+}
+
+function project-rebuild-prompt()
+{
+    # TODO(jtgans): Adjust this to work everywhere
+    local scm_name=git
+    local reset=$(term-reset-color)
+    local project_color=$(term-set-attrib bright; term-set-fg 6)
+    local baseps1="\\[${reset}${project_color}\\]${_PROJECT}\\[${reset}\\]"
+    local newps1=""
+
+    newps1="[${baseps1}|$(project-scm-prompt-git)] "
+
+    export PS1="${newps1}\h:\w\$ "
+}
 
 function project-set-prompt()
 {
-    local project_name=$1
-    local reset=$(term-reset-color)
-    local color=$(term-set-attrib bright; term-set-fg 6)
-
-    export PS1="[\\[${reset}${color}\\]${project_name}\\[${reset}\\]] ${PS1}"
+    add-hook _PROMPT_HOOKS project-rebuild-prompt
 }
 
 function project-set-dir()
