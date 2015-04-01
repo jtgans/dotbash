@@ -124,7 +124,7 @@ function unuse-all-sdks()
 {
     local cur_sdk
 
-    while [ ! -z $_SDKS ]; do
+    while [[ ! -z $_SDKS ]]; do
         local sdk=$(pop-word _SDKS)
 
         if ! unuse-sdk $sdk; then
