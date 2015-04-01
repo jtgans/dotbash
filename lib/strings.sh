@@ -48,3 +48,11 @@ function pop-word()
 	fi
 }
 
+function join()
+{
+    local separator="$1"; shift
+    local -a args=($@)
+    local regex="$(printf -- "${separator}%s" "${args[@]}")"
+    regex="${regex:${#separator}}"
+    echo "${regex}"
+}
