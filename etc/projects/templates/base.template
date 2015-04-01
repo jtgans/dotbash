@@ -31,5 +31,5 @@ function @PROJECT@-project-post-hook()
 function @PROJECT@-project-init-hook()
 {
     alias cd='project-cd'
-    project-set-prompt '@PROJECT@'
+    project-set-prompt '@PROJECT@' '@SCM@'
 }
