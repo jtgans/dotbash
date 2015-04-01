@@ -89,13 +89,13 @@ function ref-ref() {
 
         for l in $lang; do
             case "$l" in
-                header) extensions+=(\*.h)                   ;;
-                c)      extensions+=(\*.c)                   ;;
-                c++)    extensions+=(\*.c \*.cpp)            ;;
-                objc)   extensions+=(\*.c \*.cpp \*.m \*.mm) ;;
-                java)   extensions+=(\*.java)                ;;
-                make)   extensions+=(\*.mk Makefile)         ;;
-                proto)  extensions+=(\*.proto \*.protos)     ;;
+                header) extensions+=(\*.h)               ;;
+                c)      extensions+=(\*.c)               ;;
+                c++)    extensions+=(\*.c \*.cpp)        ;;
+                objc)   extensions+=(\*.m \*.mm)         ;;
+                java)   extensions+=(\*.java)            ;;
+                make)   extensions+=(\*.mk Makefile)     ;;
+                proto)  extensions+=(\*.proto \*.protos) ;;
 
                 *)
                     ref-usage
