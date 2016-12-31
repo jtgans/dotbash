@@ -2,13 +2,13 @@
 
 function term-clear-to-eol()
 {
-    tput ce
+    (tput ce || tput el) 2>/dev/null
 }
 
 function term-clear-line()
 {
 	echo -ne '\r'
-    tput ce
+    term-clear-to-eol
 }
 
 function term-move-cursor()
@@ -68,7 +68,7 @@ function term-set-attrib()
 
     case "$attrib" in
         reset)      tput sgr0 ;;
-        bright)     tput md ;;
+        bright)     (tput md || tput bold) 2>/dev/null;;
         dim)        tput mh ;;
         underscore) tput us ;;
         blink)      tput mb ;;
