@@ -3,7 +3,6 @@
 require screen
 require string
 require emacs
-require ssh
 
 eval $(dircolors -b)
 alias ls='ls --color=auto -hsF'
@@ -40,27 +39,4 @@ export DEBFULLNAME="June Tate-Gans"
 if in-screen; then
     export TERM="xterm-256color"
     unset TERMCAP  # Fix broken ncurses behavior
-
-    add-hook ssh_pre_hooks screen-ssh-pre-hook
-    add-hook ssh_post_hooks screen-ssh-post-hook
-fi
-
-add-hook ssh_pre_hooks emacs-server-ssh-pre-hook
-
-# RubyGems related stuff
-if [ ! -z "$GEM_HOME" ]; then
-    export PATH="${PATH}:$GEM_HOME/bin"
-fi
-
-if [ -z "$SSH_CLIENT" ]; then
-    daemonize-emacs
-fi
-
-# track directory, username, and cwd for remote logons
-if [ "$TERM" == "eterm-color" ]; then
-    PROMPT_COMMAND="$PROMPT_COMMAND; emacs-set-eterm-dir"
-fi
-
-if is-interactive; then
-    ssh-agent
 fi
